@@ -2,45 +2,44 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>20msVIP SCRIM SYSTEM - PRO V7</title>
+<title>20msVIP SCRIM SYSTEM - PRO FINAL</title>
 
 <style>
-body { background: #050505; color: #fff; font-family: 'Arial Black', Gadget, sans-serif; text-align: center; padding: 20px; }
-.container { background: #111; padding: 25px; border-radius: 15px; display: inline-block; border: 2px solid #00ffcc; box-shadow: 0 0 25px #00ffcc33; }
-input, button { padding: 12px; margin: 5px; border-radius: 8px; border: none; font-weight: 900; }
-input { background: #1a1a1a; color: #fff; width: 140px; border: 1px solid #333; }
-button { cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-.add { background: #00ffcc; color: #000; }
-.reset { background: #ff3e3e; color: #fff; }
-.export { background: #00acee; color: #fff; width: 100%; margin-top: 10px; font-size: 18px; }
-.wa { background: #25D366; color: #fff; width: 100%; margin-top: 5px; font-size: 16px; }
+body { background:#050505; color:#fff; font-family:'Arial Black'; text-align:center; padding:20px; }
+.container { background:#111; padding:25px; border-radius:15px; display:inline-block; border:2px solid #00ffcc; }
+input,button { padding:12px; margin:5px; border-radius:8px; border:none; font-weight:900; }
+input { background:#1a1a1a; color:#fff; width:140px; }
+button { cursor:pointer; }
+.add { background:#00ffcc; color:#000; }
+.reset { background:#ff3e3e; color:#fff; }
+.export { background:#00acee; color:#fff; width:100%; }
+.wa { background:#25D366; color:#fff; width:100%; }
 
-table { width: 95%; margin: 25px auto; border-collapse: collapse; background: #111; border: 1px solid #333; }
-th, td { border: 1px solid #222; padding: 12px; text-align: center; }
-th { background: #00ffcc; color: #000; font-size: 14px; }
-tr:nth-child(even) { background: #161616; }
+table { width:95%; margin:25px auto; border-collapse:collapse; }
+th,td { border:1px solid #222; padding:10px; }
+th { background:#00ffcc; color:#000; }
 </style>
 </head>
 
 <body>
 
-<h1 style="color:#00ffcc;">🔥 20msVIP RESULT PANEL 🔥</h1>
+<h1>🔥 20msVIP RESULT PANEL 🔥</h1>
 
 <div class="container">
-<input id="team" placeholder="TAKIM ADI">
+<input id="team" placeholder="TAKIM">
 <input id="rank" type="number" placeholder="SIRA">
 <input id="kill" type="number" placeholder="KILL">
 <br>
-<button class="add" onclick="add()">TAKIM EKLE</button>
+<button class="add" onclick="add()">EKLE</button>
 <button class="reset" onclick="resetAll()">SIFIRLA</button>
-<button class="wa" onclick="sendWhatsApp()">📱 WHATSAPP</button>
-<button class="export" onclick="exportImage()">📸 PNG EXPORT</button>
+<button class="wa" onclick="sendWhatsApp()">WHATSAPP</button>
+<button class="export" onclick="exportImage()">PNG</button>
 </div>
 
 <table>
 <thead>
 <tr>
-<th>#</th><th>TAKIM</th><th>WWNC</th><th>KILL</th><th>RANK P.</th><th>TOPLAM</th>
+<th>#</th><th>TAKIM</th><th>WWNC</th><th>KILL</th><th>RANK</th><th>TOTAL</th>
 </tr>
 </thead>
 <tbody id="board"></tbody>
@@ -50,159 +49,150 @@ tr:nth-child(even) { background: #161616; }
 
 <script>
 
-let scrimData = JSON.parse(localStorage.getItem("20ms_v7")) || [];
+let data = JSON.parse(localStorage.getItem("20ms_v7")) || [];
 
 function calc(rank, kill){
-let rp = 0;
+let rp=0;
 if(rank==1) rp=15;
 else if(rank==2) rp=12;
 else if(rank==3) rp=10;
 else if(rank<=5) rp=8;
 else if(rank<=10) rp=4;
 else if(rank<=15) rp=2;
-return { total: rp + kill, rankP: rp };
+return {total: rp+kill, rp};
 }
 
 function add(){
-const t=document.getElementById("team");
-const r=document.getElementById("rank");
-const k=document.getElementById("kill");
+let t=team.value.trim();
+let r=parseInt(rank.value);
+let k=parseInt(kill.value);
 
-if(!t.value || isNaN(r.value) || isNaN(k.value)) return alert("Tüm alanları doldur!");
+if(!t||isNaN(r)||isNaN(k)) return alert("Eksik!");
 
-const res=calc(parseInt(r.value), parseInt(k.value));
+let res=calc(r,k);
 
-scrimData.push({
-name:t.value.toUpperCase(),
-rank:parseInt(r.value),
-kill:parseInt(k.value),
-rankP:res.rankP,
-total:res.total
-});
-
-localStorage.setItem("20ms_v7", JSON.stringify(scrimData));
+data.push({name:t.toUpperCase(), rank:r, kill:k, rp:res.rp, total:res.total});
+localStorage.setItem("20ms_v7",JSON.stringify(data));
 render();
 
-t.value=""; r.value=""; k.value=""; t.focus();
+team.value=""; rank.value=""; kill.value="";
 }
 
-function getProcessedData(){
+function getData(){
 let stats={};
 
-scrimData.forEach(d=>{
-if(!stats[d.name]) stats[d.name]={ total:0, kills:0, rp:0, wins:0 };
+data.forEach(d=>{
+if(!stats[d.name]) stats[d.name]={total:0,k:0,rp:0,w:0};
 
 stats[d.name].total+=d.total;
-stats[d.name].kills+=d.kill;
-stats[d.name].rp+=d.rankP;
-if(d.rank==1) stats[d.name].wins+=1;
+stats[d.name].k+=d.kill;
+stats[d.name].rp+=d.rp;
+if(d.rank==1) stats[d.name].w++;
 });
 
 return Object.entries(stats).sort((a,b)=>b[1].total-a[1].total);
 }
 
 function render(){
-const sorted=getProcessedData();
+let list=getData();
 let html="";
 
-sorted.forEach((item,i)=>{
+list.forEach((x,i)=>{
 html+=`
 <tr>
 <td>${i+1}</td>
-<td><b>${item[0]}</b></td>
-<td>${item[1].wins || '-'}</td>
-<td>${item[1].kills}</td>
-<td>${item[1].rp}</td>
-<td><b>${item[1].total}</b></td>
+<td>${x[0]}</td>
+<td>${x[1].w? "x"+x[1].w:"-"}</td>
+<td>${x[1].k}</td>
+<td>${x[1].rp}</td>
+<td>${x[1].total}</td>
 </tr>`;
 });
 
-document.getElementById("board").innerHTML=html;
+board.innerHTML=html;
 }
 
-// 🔥 YENİ PROFESYONEL WHATSAPP MESAJ
+// 🔥 WHATSAPP
 function sendWhatsApp(){
-const list=getProcessedData();
-if(list.length===0) return alert("Veri yok!");
+let list=getData();
+let msg="20msVIP DAILY RESULT\n\n";
 
-let msg="🔥 *20msVIP DAILY RESULT* 🔥%0A%0A";
+list.forEach((x,i)=>{
 
-list.forEach((item,i)=>{
+let w = x[1].w>0 ? "WWNC: x"+x[1].w+"\n":"";
 
-let winText = item[1].wins>0 ? " x"+item[1].wins : "";
-
-msg+=`*${i+1}. ${item[0]}${winText}*%0A`;
-msg+=`🔫 Kill: ${item[1].kills}%0A`;
-msg+=`📊 Rank: ${item[1].rp}%0A`;
-msg+=`🧮 Total: ${item[1].total}%0A%0A`;
+msg+=`${i+1}. ${x[0]}\n`;
+msg+=w;
+msg+=`Kill: ${x[1].k}\n`;
+msg+=`Rank: ${x[1].rp}\n`;
+msg+=`Total: ${x[1].total}\n\n`;
 });
 
-window.open("https://wa.me/?text="+msg,"_blank");
+window.open("https://wa.me/?text="+encodeURIComponent(msg));
 }
 
 function resetAll(){
-if(confirm("Silinsin mi?")){
-scrimData=[];
-localStorage.removeItem("20ms_v7");
+if(confirm("Sil?")){
+data=[];
+localStorage.clear();
 render();
 }
 }
 
-// PNG EXPORT (AYNI)
+// 🔥 PERFECT HİZALI PNG
 function exportImage(){
 
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
+let c=canvas;
+let ctx=c.getContext("2d");
 
-const bg=new Image();
+let bg=new Image();
 bg.src="IMG-20260423-WA0006.jpg";
 
 bg.onload=function(){
 
 ctx.drawImage(bg,0,0,1920,1080);
 
-const list=getProcessedData();
+let list=getData();
 
-ctx.fillStyle="white";
+ctx.fillStyle="#fff";
 ctx.textAlign="center";
 ctx.textBaseline="middle";
 
-const startY=328;
-const rowH=49.35;
+let startY=330;
+let h=50;
 
-list.forEach((item,i)=>{
-if(i>=25) return;
+list.forEach((x,i)=>{
+if(i>=25)return;
 
-const d={name:item[0],wins:item[1].wins,kill:item[1].kills,rp:item[1].rp,total:item[1].total};
-const isLeft=i<13;
-const index=isLeft?i:i-13;
-const y=startY+(index*rowH);
+let left=i<13;
+let y=startY+( (left?i:i-13)*h );
 
-const colX=isLeft
-? {name:185,wwnc:308,kill:408,rank:512,total:625}
-: {name:755,wwnc:878,kill:978,rank:1082,total:1195};
+let col = left
+? {name:190,w:310,k:410,r:510,t:630}
+: {name:760,w:880,k:980,r:1080,t:1200};
 
-let fontSize=28;
-ctx.font="900 "+fontSize+"px Arial Black";
-
-while(ctx.measureText(d.name).width>185 && fontSize>16){
-fontSize--;
-ctx.font="900 "+fontSize+"px Arial Black";
+// TEAM (auto size)
+let size=30;
+ctx.font="900 "+size+"px Arial Black";
+while(ctx.measureText(x[0]).width>180 && size>18){
+size--; ctx.font="900 "+size+"px Arial Black";
 }
+ctx.fillText(x[0],col.name,y);
 
-ctx.fillText(d.name,colX.name,y);
+// STATS
+ctx.font="900 30px Arial Black";
+ctx.fillText(x[1].w? "x"+x[1].w:"-",col.w,y);
+ctx.fillText(x[1].k,col.k,y);
+ctx.fillText(x[1].rp,col.r,y);
+ctx.fillText(x[1].total,col.t,y);
 
-ctx.font="900 29px Arial Black";
-ctx.fillText(d.wins>0?"x"+d.wins:"-",colX.wwnc,y);
-ctx.fillText(d.kill,colX.kill,y);
-ctx.fillText(d.rp,colX.rank,y);
-ctx.fillText(d.total,colX.total,y);
 });
 
-const link=document.createElement("a");
-link.download="20msVIP_RESULT.png";
-link.href=canvas.toDataURL("image/png");
+let link=document.createElement("a");
+link.download="result.png";
+link.href=c.toDataURL();
 link.click();
+
 };
 }
 
