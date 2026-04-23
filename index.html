@@ -31,7 +31,6 @@ th{background:#00ffcc;color:#000;}
 
 <input id="team" placeholder="TEAM">
 
-<!-- MATCHLER -->
 <div class="match">Match 1<br>
 <input id="r1" placeholder="Rank">
 <input id="m1p1" placeholder="P1">
@@ -84,7 +83,8 @@ th{background:#00ffcc;color:#000;}
 
 <script>
 
-let data=[];
+// 🔥 SADECE BURASI DEĞİŞTİ
+let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 
 // PUBG PUAN
 function rp(r){
@@ -112,13 +112,10 @@ let wins=0;
 for(let i=1;i<=4;i++){
 
 let rInput=document.getElementById("r"+i).value;
-
-// boşsa geç
 if(rInput==="") continue;
 
 let r=Number(rInput);
 
-// playerlar
 let p1=Number(document.getElementById("m"+i+"p1").value)||0;
 let p2=Number(document.getElementById("m"+i+"p2").value)||0;
 let p3=Number(document.getElementById("m"+i+"p3").value)||0;
@@ -142,9 +139,11 @@ t:total,
 w:wins
 });
 
+// 🔥 SADECE BU EKLENDİ
+localStorage.setItem("scrimData", JSON.stringify(data));
+
 render();
 
-// temizle
 document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
@@ -194,10 +193,11 @@ window.open("https://wa.me/?text="+encodeURIComponent(msg));
 // RESET
 function resetAll(){
 data=[];
+localStorage.removeItem("scrimData"); // 🔥 EKLENDİ
 board.innerHTML="";
 }
 
-// PNG
+// PNG (Aynı)
 function exportImage(){
 
 let c=canvas;
@@ -214,10 +214,8 @@ ctx.font="30px Arial";
 let y=100;
 
 sorted.forEach((x,i)=>{
-
 ctx.fillText(`${i+1}. ${x.name} - ${x.t}`,100,y);
 y+=40;
-
 });
 
 let link=document.createElement("a");
@@ -226,7 +224,9 @@ link.href=c.toDataURL();
 link.click();
 }
 
-</script>
+// 🔥 SAYFA AÇILINCA VERİYİ GÖSTER
+render();
 
+</script>
 </body>
 </html>
