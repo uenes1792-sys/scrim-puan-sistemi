@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>20msVIP SCRIM SYSTEM - PRO FINAL</title>
+<title>20msVIP SCRIM SYSTEM - FINAL</title>
 
 <style>
 body { background:#050505; color:#fff; font-family:'Arial Black'; text-align:center; padding:20px; }
@@ -67,7 +67,7 @@ let t=team.value.trim();
 let r=parseInt(rank.value);
 let k=parseInt(kill.value);
 
-if(!t||isNaN(r)||isNaN(k)) return alert("Eksik!");
+if(!t||isNaN(r)||isNaN(k)) return alert("Eksik veri!");
 
 let res=calc(r,k);
 
@@ -84,9 +84,9 @@ let stats={};
 data.forEach(d=>{
 if(!stats[d.name]) stats[d.name]={total:0,k:0,rp:0,w:0};
 
-stats[d.name].total+=d.total;
-stats[d.name].k+=d.kill;
-stats[d.name].rp+=d.rp;
+stats[d.name].total+=d.total || 0;
+stats[d.name].k+=d.kill || 0;
+stats[d.name].rp+=d.rp || 0;
 if(d.rank==1) stats[d.name].w++;
 });
 
@@ -112,7 +112,7 @@ html+=`
 board.innerHTML=html;
 }
 
-// 🔥 WHATSAPP
+// 🔥 WHATSAPP (NaN FIX)
 function sendWhatsApp(){
 let list=getData();
 let msg="20msVIP DAILY RESULT\n\n";
@@ -120,11 +120,12 @@ let msg="20msVIP DAILY RESULT\n\n";
 list.forEach((x,i)=>{
 
 let w = x[1].w>0 ? "WWNC: x"+x[1].w+"\n":"";
+let rankVal = x[1].rp || 0;
 
 msg+=`${i+1}. ${x[0]}\n`;
 msg+=w;
 msg+=`Kill: ${x[1].k}\n`;
-msg+=`Rank: ${x[1].rp}\n`;
+msg+=`Rank: ${rankVal}\n`;
 msg+=`Total: ${x[1].total}\n\n`;
 });
 
@@ -132,14 +133,14 @@ window.open("https://wa.me/?text="+encodeURIComponent(msg));
 }
 
 function resetAll(){
-if(confirm("Sil?")){
+if(confirm("Silinsin mi?")){
 data=[];
 localStorage.clear();
 render();
 }
 }
 
-// 🔥 PERFECT HİZALI PNG
+// 🔥 PNG EXPORT (HİZALI)
 function exportImage(){
 
 let c=canvas;
@@ -171,19 +172,20 @@ let col = left
 ? {name:190,w:310,k:410,r:510,t:630}
 : {name:760,w:880,k:980,r:1080,t:1200};
 
-// TEAM (auto size)
 let size=30;
 ctx.font="900 "+size+"px Arial Black";
+
 while(ctx.measureText(x[0]).width>180 && size>18){
-size--; ctx.font="900 "+size+"px Arial Black";
+size--;
+ctx.font="900 "+size+"px Arial Black";
 }
+
 ctx.fillText(x[0],col.name,y);
 
-// STATS
 ctx.font="900 30px Arial Black";
 ctx.fillText(x[1].w? "x"+x[1].w:"-",col.w,y);
 ctx.fillText(x[1].k,col.k,y);
-ctx.fillText(x[1].rp,col.r,y);
+ctx.fillText(x[1].rp||0,col.r,y);
 ctx.fillText(x[1].total,col.t,y);
 
 });
