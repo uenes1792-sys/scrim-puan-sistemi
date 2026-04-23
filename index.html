@@ -2,217 +2,234 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>20msVIP SCRIM SYSTEM - Full Hizalama</title>
+    <title>20msVIP SCRIM SYSTEM - PRO VERSION</title>
     <style>
         body {
-            background: #000;
-            color: white;
-            font-family: 'Arial', sans-serif;
+            background: #050505;
+            color: #fff;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
             text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 30px;
         }
-        h1 { color: #00ffcc; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-        .panel { background: #111; padding: 25px; border-radius: 12px; display: inline-block; border: 1px solid #333; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        input, button { padding: 12px; margin: 5px; border-radius: 6px; border: none; font-weight: bold; font-size: 14px; }
-        input { background: #222; color: white; width: 150px; border: 1px solid #444; }
-        input:focus { outline: 2px solid #00ffcc; border-color: transparent; }
-        button { cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; }
+        .header-title { color: #00ffcc; text-transform: uppercase; letter-spacing: 4px; font-size: 28px; margin-bottom: 30px; }
+        .control-panel { 
+            background: #111; 
+            padding: 30px; 
+            border-radius: 15px; 
+            display: inline-block; 
+            border: 2px solid #222;
+            box-shadow: 0 0 20px rgba(0,255,204,0.1);
+        }
+        input, button { padding: 15px; margin: 8px; border-radius: 8px; border: none; font-weight: 800; outline: none; }
+        input { background: #1a1a1a; color: #fff; width: 180px; border: 1px solid #333; }
+        input:focus { border-color: #00ffcc; background: #222; }
+        
+        button { cursor: pointer; transition: 0.3s; text-transform: uppercase; min-width: 120px; }
         .add-btn { background: #00ffcc; color: #000; }
-        .reset-btn { background: #ff4d4d; color: #fff; }
+        .reset-btn { background: #ff3333; color: #fff; }
         .wa-btn { background: #25D366; color: #fff; }
-        .export-btn { background: #00acee; color: #fff; }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        .export-btn { background: #007bff; color: #fff; }
+        button:hover { transform: scale(1.05); filter: brightness(1.2); }
 
         table {
-            width: 95%;
-            margin: 25px auto;
+            width: 100%;
+            max-width: 1100px;
+            margin: 40px auto;
             border-collapse: collapse;
-            background: #111;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border-radius: 8px;
+            background: #0f0f0f;
+            border-radius: 12px;
             overflow: hidden;
         }
-        th, td { border: 1px solid #222; padding: 12px; text-align: center; font-size: 14px; }
-        th { background: #1a1a1a; color: #00ffcc; font-weight: 600; text-transform: uppercase; }
-        tr:nth-child(even) { background: #171717; }
-        tr:hover { background: #222; }
+        th, td { border: 1px solid #1a1a1a; padding: 15px; font-size: 16px; }
+        th { background: #00ffcc; color: #000; font-weight: 900; }
+        tr:nth-child(even) { background: #141414; }
     </style>
 </head>
 <body>
 
-    <h1>🔥 20msVIP SCRIM PANEL</h1>
+    <div class="header-title">🔥 20msVIP ORGANIZATION PANEL 🔥</div>
 
-    <div class="panel">
-        <input id="team" placeholder="Takım Adı">
-        <input id="rank" type="number" placeholder="Sıralama (1, 2, 3...)">
-        <input id="kill" type="number" placeholder="Toplam Kill">
+    <div class="control-panel">
+        <input id="team" placeholder="TAKIM ADI">
+        <input id="rank" type="number" placeholder="SIRALAMA">
+        <input id="kill" type="number" placeholder="KILL SAYISI">
         <br>
-        <button class="add-btn" onclick="add()">Ekle</button>
-        <button class="reset-btn" onclick="resetAll()">Sıfırla</button>
-        <button class="wa-btn" onclick="sendWhatsApp()">WhatsApp Mesajı</button>
-        <button class="export-btn" onclick="exportImage()">📸 PNG OLARAK KAYDET</button>
+        <button class="add-btn" onclick="addTeam()">TAKIM EKLE</button>
+        <button class="reset-btn" onclick="resetData()">SIFIRLA</button>
+        <button class="wa-btn" onclick="shareWhatsApp()">WHATSAPP</button>
+        <button class="export-btn" onclick="exportResult()">📸 GÖRSEL OLUŞTUR</button>
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>#</th>
-                <th>Takım</th>
+                <th>TAKIM</th>
                 <th>WWNC</th>
-                <th>Kill</th>
-                <th>Sıra Puanı</th>
-                <th>Toplam</th>
+                <th>KILL PUAN</th>
+                <th>SIRA PUAN</th>
+                <th>TOPLAM</th>
             </tr>
         </thead>
         <tbody id="board"></tbody>
     </table>
 
-    <canvas id="canvas" width="1920" height="1080" style="display:none;"></canvas>
+    <canvas id="renderCanvas" width="1920" height="1080" style="display:none;"></canvas>
 
 <script>
-    let data = JSON.parse(localStorage.getItem("scrim_data_v4")) || [];
+    let scrimData = JSON.parse(localStorage.getItem("20msvip_scrim_v5")) || [];
 
-    function calc(rank, kill) {
-        let p = 0;
-        if (rank == 1) p = 15;
-        else if (rank == 2) p = 12;
-        else if (rank == 3) p = 10;
-        else if (rank <= 5) p = 8;
-        else if (rank <= 10) p = 4;
-        else if (rank <= 15) p = 2;
-        return p + kill;
+    function calculatePoints(rank, kill) {
+        let rankP = 0;
+        if (rank == 1) rankP = 15;
+        else if (rank == 2) rankP = 12;
+        else if (rank == 3) rankP = 10;
+        else if (rank <= 5) rankP = 8;
+        else if (rank <= 10) rankP = 4;
+        else if (rank <= 15) rankP = 2;
+        return { total: rankP + kill, rankOnly: rankP };
     }
 
-    function add() {
-        let t = document.getElementById("team");
-        let r = document.getElementById("rank");
-        let k = document.getElementById("kill");
+    function addTeam() {
+        const tInput = document.getElementById("team");
+        const rInput = document.getElementById("rank");
+        const kInput = document.getElementById("kill");
 
-        let team = t.value.trim();
-        let rank = parseInt(r.value);
-        let kill = parseInt(k.value);
+        const teamName = tInput.value.trim();
+        const rankValue = parseInt(rInput.value);
+        const killValue = parseInt(kInput.value);
 
-        if (!team || isNaN(rank) || isNaN(kill)) {
-            alert("Lütfen tüm alanları doldurun!");
+        if (!teamName || isNaN(rankValue) || isNaN(killValue)) {
+            alert("Lütfen tüm alanları geçerli şekilde doldurun!");
             return;
         }
 
-        data.push({ team, rank, kill, point: calc(rank, kill) });
-        save();
-        render();
+        const pts = calculatePoints(rankValue, killValue);
+        scrimData.push({ 
+            name: teamName, 
+            rank: rankValue, 
+            kill: killValue, 
+            rankPoint: pts.rankOnly, 
+            total: pts.total 
+        });
 
-        t.value = ""; r.value = ""; k.value = "";
-        t.focus();
+        localStorage.setItem("20msvip_scrim_v5", JSON.stringify(scrimData));
+        updateUI();
+        
+        tInput.value = ""; rInput.value = ""; kInput.value = "";
+        tInput.focus();
     }
 
-    function save() { localStorage.setItem("scrim_data_v4", JSON.stringify(data)); }
-
-    function resetAll() {
-        if (confirm("Veriler sıfırlansın mı?")) {
-            data = [];
-            save();
-            render();
+    function resetData() {
+        if(confirm("Tüm verileri silmek istediğine emin misin?")) {
+            scrimData = [];
+            localStorage.removeItem("20msvip_scrim_v5");
+            updateUI();
         }
     }
 
-    function getBoard() {
-        let t = {}, k = {}, r = {}, w = {};
-        data.forEach(d => {
-            t[d.team] = (t[d.team] || 0) + d.point;
-            k[d.team] = (k[d.team] || 0) + d.kill;
-            r[d.team] = (r[d.team] || 0) + (d.point - d.kill);
-            if (d.rank == 1) w[d.team] = (w[d.team] || 0) + 1;
+    function processBoard() {
+        let stats = {};
+        scrimData.forEach(entry => {
+            if(!stats[entry.name]) {
+                stats[entry.name] = { total:0, kills:0, rankPts:0, wins:0 };
+            }
+            stats[entry.name].total += entry.total;
+            stats[entry.name].kills += entry.kill;
+            stats[entry.name].rankPts += entry.rankPoint;
+            if(entry.rank === 1) stats[entry.name].wins += 1;
         });
 
-        return Object.entries(t)
-            .sort((a, b) => b[1] - a[1]) // Toplam puana göre sırala
-            .map((x, i) => ({
-                pos: i + 1,
-                team: x[0],
-                total: x[1],
-                kill: k[x[0]] || 0,
-                rank: r[x[0]] || 0,
-                win: w[x[0]] || 0
+        return Object.entries(stats)
+            .sort((a, b) => b[1].total - a[1].total)
+            .map((item, index) => ({
+                pos: index + 1,
+                name: item[0],
+                ...item[1]
             }));
     }
 
-    function render() {
-        let arr = getBoard();
+    function updateUI() {
+        const board = processBoard();
         let html = "";
-        arr.forEach(d => {
-            html += `<tr><td>${d.pos}</td><td>${d.team}</td><td>${d.win ? "x" + d.win : "-"}</td><td>${d.kill}</td><td>${d.rank}</td><td>${d.total}</td></tr>`;
+        board.forEach(d => {
+            html += `<tr>
+                <td>${d.pos}</td>
+                <td><b>${d.name}</b></td>
+                <td>${d.wins > 0 ? 'x'+d.wins : '-'}</td>
+                <td>${d.kills}</td>
+                <td>${d.rankPts}</td>
+                <td><b>${d.total}</b></td>
+            </tr>`;
         });
         document.getElementById("board").innerHTML = html;
     }
 
-    function sendWhatsApp() {
-        let arr = getBoard();
-        let text = "🔥 *20msVIP RESULT*%0A%0A";
-        arr.forEach(d => {
-            text += `*${d.pos}.* ${d.team} | Total: ${d.total} | Kill: ${d.kill}%0A`;
+    function shareWhatsApp() {
+        const board = processBoard();
+        let msg = "🏆 *20msVIP SCRIM RESULTS* 🏆%0A%0A";
+        board.forEach(d => {
+            msg += `*${d.pos}.* ${d.name} - *${d.total} Pts*%0A`;
         });
-        window.open("https://wa.me/?text=" + text, "_blank");
+        window.open(`https://wa.me/?text=${msg}`, "_blank");
     }
 
-    function exportImage() {
-        let canvas = document.getElementById("canvas");
-        let ctx = canvas.getContext("2d");
-        let bg = new Image();
-        
-        // Dosya ismi orijinaliyle aynı kalmalı
-        bg.src = "IMG-20260423-WA0006.jpg"; 
+    function exportResult() {
+        const canvas = document.getElementById("renderCanvas");
+        const ctx = canvas.getContext("2d");
+        const background = new Image();
+        background.src = "IMG-20260423-WA0006.jpg"; 
 
-        bg.onload = function() {
-            // Görseli yatay (1920x1080) çiziyoruz
-            ctx.clearRect(0, 0, 1920, 1080);
-            ctx.drawImage(bg, 0, 0, 1920, 1080);
+        background.onload = function() {
+            ctx.drawImage(background, 0, 0, 1920, 1080);
 
-            let arr = getBoard();
+            const teams = processBoard();
+            
+            // FONT AYARLARI (MAKSİMUM KALINLIK VE NETLİK)
+            ctx.fillStyle = "#FFFFFF";
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.shadowBlur = 4;
+            ctx.font = "900 28px Arial, Helvetica, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
 
-            // YAZI AYARLARI VE NETLİK
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 26px Arial, sans-serif"; // Daha kalın ve net font
-            ctx.textAlign = "center"; // Tüm sütunlar için ortalama
-            ctx.textBaseline = "middle"; // Satırları tam ortala
+            const startY = 328;   
+            const rowGap = 49.2; // Hassas satır aralığı
 
-            // Başlangıç koordinatları (image_3.png'ye göre milimetrik)
-            let startY = 328;   // İlk takımın (Rank 1/Rank 14) Y koordinatı
-            let rowHeight = 49; // Satırlar arası boşluk
-
-            // SOL TABLO (1-13)
-            arr.slice(0, 13).forEach((d, i) => {
-                let y = startY + (i * rowHeight);
+            // SOL TARAF (1 - 13)
+            teams.slice(0, 13).forEach((t, i) => {
+                const y = startY + (i * rowGap);
                 
-                // Koordinatlar sütunların tam orta noktalarıdır
-                ctx.fillText(d.team, 178, y);              // TEAM NAME
-                ctx.fillText(d.win ? "x"+d.win : "-", 298, y); // WWNC
-                ctx.fillText(d.kill, 395, y);              // KILL POINTS
-                ctx.fillText(d.rank, 502, y);              // RANK POINTS
-                ctx.fillText(d.total, 615, y);             // TOTAL POINTS
+                // Koordinatlar Arası Geniş Boşluklar (Hizalı)
+                ctx.fillText(t.name.toUpperCase(), 180, y);      // Takım ismi (Büyük Harf)
+                ctx.fillText(t.wins > 0 ? "x"+t.wins : "-", 305, y); // WWNC
+                ctx.fillText(t.kills, 405, y);                    // Kill
+                ctx.fillText(t.rankPts, 510, y);                  // Rank Pts
+                ctx.fillText(t.total, 625, y);                    // Total
             });
 
-            // SAĞ TABLO (14-25)
-            arr.slice(13, 25).forEach((d, i) => {
-                let y = startY + (i * rowHeight);
+            // SAĞ TARAF (14 - 25)
+            teams.slice(13, 25).forEach((t, i) => {
+                const y = startY + (i * rowGap);
                 
-                // Sağ tarafın koordinatları
-                ctx.fillText(d.team, 742, y);              // TEAM NAME
-                ctx.fillText(d.win ? "x"+d.win : "-", 862, y); // WWNC
-                ctx.fillText(d.kill, 959, y);              // KILL POINTS
-                ctx.fillText(d.rank, 1066, y);             // RANK POINTS
-                ctx.fillText(d.total, 1179, y);            // TOTAL POINTS
+                ctx.fillText(t.name.toUpperCase(), 750, y);      // Takım ismi
+                ctx.fillText(t.wins > 0 ? "x"+t.wins : "-", 875, y); // WWNC
+                ctx.fillText(t.kills, 975, y);                    // Kill
+                ctx.fillText(t.rankPts, 1080, y);                 // Rank Pts
+                ctx.fillText(t.total, 1195, y);                   // Total
             });
 
-            // Resmi İndir
-            let link = document.createElement("a");
-            link.download = "20msVIP_Günün_Sonucu.png";
+            // Otomatik İndirme
+            const link = document.createElement("a");
+            link.download = "20msVIP_Official_Result.png";
             link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
         };
     }
 
-    render();
+    // Sayfa açıldığında tabloyu doldur
+    updateUI();
 </script>
 
 </body>
