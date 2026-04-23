@@ -2,37 +2,55 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>20msVIP SCRIM SYSTEM - FINAL FIXED</title>
+<title>20msVIP SCRIM SYSTEM</title>
 
 <style>
 body { background:#050505; color:#fff; font-family:'Arial Black'; text-align:center; padding:20px; }
 .container { background:#111; padding:25px; border-radius:15px; display:inline-block; border:2px solid #00ffcc; }
-input,button { padding:12px; margin:5px; border-radius:8px; border:none; font-weight:900; }
-input { background:#1a1a1a; color:#fff; width:100px; }
-button { cursor:pointer; }
-.add { background:#00ffcc; color:#000; }
-.reset { background:#ff3e3e; color:#fff; }
-.export { background:#00acee; color:#fff; width:100%; }
-.wa { background:#25D366; color:#fff; width:100%; }
 
-table { width:95%; margin:25px auto; border-collapse:collapse; }
-th,td { border:1px solid #222; padding:10px; }
-th { background:#00ffcc; color:#000; }
+input,button,select {
+padding:10px;
+margin:5px;
+border-radius:8px;
+border:none;
+font-weight:900;
+}
+
+input { background:#1a1a1a; color:#fff; width:80px; }
+
+button { cursor:pointer; }
+
+.calcBtn { background:#00ffcc; color:#000; }
+.reset { background:#ff3e3e; color:#fff; }
+
+table {
+width:95%;
+margin:25px auto;
+border-collapse:collapse;
+}
+
+th,td {
+border:1px solid #222;
+padding:10px;
+}
+
+th {
+background:#00ffcc;
+color:#000;
+}
 </style>
 </head>
 
 <body>
 
-<h1>🔥 20msVIP RESULT PANEL 🔥</h1>
+<h1>🔥 20msVIP MATCH PANEL 🔥</h1>
 
 <div class="container">
 
-<input id="team" placeholder="TAKIM">
-<input id="rank" type="number" placeholder="SIRA">
+<input id="team" placeholder="TEAM">
+<input id="rank" type="number" placeholder="RANK">
 
-<br><br>
-
-<b>PLAYER KILLS</b><br>
+<br>
 
 <input id="p1" type="number" placeholder="P1">
 <input id="p2" type="number" placeholder="P2">
@@ -41,27 +59,43 @@ th { background:#00ffcc; color:#000; }
 
 <br>
 
-<button class="add" onclick="add()">EKLE</button>
+<select id="matchNo">
+<option value="1">MATCH 1</option>
+<option value="2">MATCH 2</option>
+<option value="3">MATCH 3</option>
+<option value="4">MATCH 4</option>
+</select>
+
+<br>
+
+<button onclick="add()">EKLE</button>
 <button class="reset" onclick="resetAll()">SIFIRLA</button>
-<button class="wa" onclick="sendWhatsApp()">WHATSAPP</button>
-<button class="export" onclick="exportImage()">PNG</button>
+
+<br><br>
+
+<button class="calcBtn" onclick="calculate(1)">1 MAÇ</button>
+<button class="calcBtn" onclick="calculate(2)">2 MAÇ</button>
+<button class="calcBtn" onclick="calculate(3)">3 MAÇ</button>
+<button class="calcBtn" onclick="calculate(4)">4 MAÇ</button>
 
 </div>
 
 <table>
 <thead>
 <tr>
-<th>#</th><th>TAKIM</th><th>WWNC</th><th>KILL</th><th>RANK</th><th>TOTAL</th>
+<th>#</th>
+<th>TEAM</th>
+<th>KILL</th>
+<th>RANK</th>
+<th>TOTAL</th>
 </tr>
 </thead>
 <tbody id="board"></tbody>
 </table>
 
-<canvas id="canvas" width="1920" height="1080" style="display:none;"></canvas>
-
 <script>
 
-let data = JSON.parse(localStorage.getItem("20ms_v7")) || [];
+let data = [];
 
 // 🔥 PUBG PUAN SİSTEMİ
 function getRankPoint(rank){
@@ -76,162 +110,93 @@ if(rank>=8 && rank<=12) return 1;
 return 0;
 }
 
-// 🔥 ADD (PLAYER KILL DESTEKLİ)
+// 🔥 EKLE
 function add(){
 
-let t=team.value.trim();
-let r=parseInt(rank.value);
+let t = team.value.trim();
+let r = parseInt(rank.value);
+let match = Number(matchNo.value);
 
-// boş = 0
+// 🔥 TÜM BOŞLAR = 0
 let p1v = Number(p1.value) || 0;
 let p2v = Number(p2.value) || 0;
 let p3v = Number(p3.value) || 0;
 let p4v = Number(p4.value) || 0;
 
-let totalKill = p1v + p2v + p3v + p4v;
+let kill = p1v + p2v + p3v + p4v;
 
-if(!t||isNaN(r)) return alert("Eksik veri!");
-
-data.push({
-name:t.toUpperCase(),
-rank:r,
-kill:totalKill
-});
-
-localStorage.setItem("20ms_v7",JSON.stringify(data));
-render();
-
-// temizle
-team.value=""; rank.value="";
-p1.value=""; p2.value=""; p3.value=""; p4.value="";
+// ❗ SADECE RANK ZORUNLU
+if(isNaN(r)){
+alert("Sıralama boş olamaz!");
+return;
 }
 
-// 🔥 DATA
-function getData(){
-let stats={};
+// takım boşsa otomatik isim
+if(!t){
+t = "TEAM_" + Math.floor(Math.random()*1000);
+}
+
+data.push({
+name: t.toUpperCase(),
+rank: r,
+kill: kill,
+match: match
+});
+
+// temizle
+team.value="";
+rank.value="";
+p1.value="";
+p2.value="";
+p3.value="";
+p4.value="";
+}
+
+// 🔥 HESAPLA
+function calculate(matchLimit){
+
+let stats = {};
 
 data.forEach(d=>{
 
+if(d.match > matchLimit) return;
+
 let rp = getRankPoint(d.rank);
 
-if(!stats[d.name]) stats[d.name]={total:0,k:0,rp:0,w:0};
+if(!stats[d.name]) stats[d.name]={k:0,r:0,t:0};
 
-stats[d.name].k += d.kill || 0;
-stats[d.name].rp += rp;
-stats[d.name].total += (rp + (d.kill||0));
-
-if(d.rank==1) stats[d.name].w++;
+stats[d.name].k += d.kill;
+stats[d.name].r += rp;
+stats[d.name].t += (d.kill + rp);
 });
 
-return Object.entries(stats).sort((a,b)=>b[1].total-a[1].total);
-}
+// sırala
+let sorted = Object.entries(stats).sort((a,b)=>b[1].t - a[1].t);
 
-function render(){
-let list=getData();
-let html="";
+// yazdır
+let html = "";
 
-list.forEach((x,i)=>{
-html+=`
+sorted.forEach((x,i)=>{
+html += `
 <tr>
 <td>${i+1}</td>
 <td>${x[0]}</td>
-<td>${x[1].w? "x"+x[1].w:"-"}</td>
 <td>${x[1].k}</td>
-<td>${x[1].rp}</td>
-<td>${x[1].total}</td>
+<td>${x[1].r}</td>
+<td>${x[1].t}</td>
 </tr>`;
 });
 
-board.innerHTML=html;
+board.innerHTML = html;
 }
 
-// 🔥 WHATSAPP
-function sendWhatsApp(){
-let list=getData();
-let msg="20msVIP DAILY RESULT\n\n";
-
-list.forEach((x,i)=>{
-
-let w = x[1].w>0 ? "WWNC: x"+x[1].w+"\n":"";
-
-msg+=`${i+1}. ${x[0]}\n`;
-msg+=w;
-msg+=`Kill: ${x[1].k}\n`;
-msg+=`Rank: ${x[1].rp}\n`;
-msg+=`Total: ${x[1].total}\n\n`;
-});
-
-window.open("https://wa.me/?text="+encodeURIComponent(msg));
-}
-
+// 🔥 RESET
 function resetAll(){
-if(confirm("Silinsin mi?")){
-data=[];
-localStorage.clear();
-render();
+data = [];
+board.innerHTML = "";
 }
-}
-
-// 🔥 PNG EXPORT (AYNI)
-function exportImage(){
-
-let c=canvas;
-let ctx=c.getContext("2d");
-
-let bg=new Image();
-bg.src="IMG-20260423-WA0006.jpg";
-
-bg.onload=function(){
-
-ctx.drawImage(bg,0,0,1920,1080);
-
-let list=getData();
-
-ctx.fillStyle="#fff";
-ctx.textAlign="center";
-ctx.textBaseline="middle";
-
-let startY=330;
-let h=50;
-
-list.forEach((x,i)=>{
-if(i>=25)return;
-
-let left=i<13;
-let y=startY+( (left?i:i-13)*h );
-
-let col = left
-? {name:190,w:310,k:410,r:510,t:630}
-: {name:760,w:880,k:980,r:1080,t:1200};
-
-let size=30;
-ctx.font="900 "+size+"px Arial Black";
-
-while(ctx.measureText(x[0]).width>180 && size>18){
-size--;
-ctx.font="900 "+size+"px Arial Black";
-}
-
-ctx.fillText(x[0],col.name,y);
-
-ctx.font="900 30px Arial Black";
-ctx.fillText(x[1].w? "x"+x[1].w:"-",col.w,y);
-ctx.fillText(x[1].k,col.k,y);
-ctx.fillText(x[1].rp,col.r,y);
-ctx.fillText(x[1].total,col.t,y);
-
-});
-
-let link=document.createElement("a");
-link.download="result.png";
-link.href=c.toDataURL();
-link.click();
-
-};
-}
-
-render();
 
 </script>
+
 </body>
 </html>
