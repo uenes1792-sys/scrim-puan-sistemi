@@ -67,7 +67,6 @@ tr:hover{
 
 <h1>🔥 PRO SCRIM SYSTEM</h1>
 
-<!-- TEAM NAME FREE INPUT -->
 <input id="team" placeholder="Team Name">
 <input id="rank" placeholder="Rank (1-20)">
 <input id="kill" placeholder="Kills">
@@ -120,17 +119,21 @@ function calc(rank,kills){
   else if(rank<=5) p=8;
   else if(rank<=10) p=4;
   else if(rank<=15) p=2;
-  return p+kills;
+  return p + (kills || 0);
 }
 
 // ADD MATCH
 function add(){
-  let team=document.getElementById("team").value;
+  let team=document.getElementById("team").value.trim();
   let rank=parseInt(document.getElementById("rank").value);
   let kill=parseInt(document.getElementById("kill").value);
-  let match=data.length+1;
 
-  if(!team) return alert("Enter team name!");
+  if(!team || isNaN(rank) || isNaN(kill)){
+    alert("Lütfen tüm alanları doğru doldur!");
+    return;
+  }
+
+  let match=data.length+1;
 
   data.push({
     team,
@@ -142,6 +145,11 @@ function add(){
 
   save();
   render();
+
+  // 🔥 INPUT TEMİZLE
+  document.getElementById("team").value = "";
+  document.getElementById("rank").value = "";
+  document.getElementById("kill").value = "";
 }
 
 // DELETE
@@ -151,7 +159,7 @@ function del(i){
   render();
 }
 
-// RESET
+// RESET ALL
 function resetAll(){
   if(confirm("RESET ALL DATA?")){
     data=[];
@@ -160,7 +168,7 @@ function resetAll(){
   }
 }
 
-// SAVE LOCAL STORAGE
+// SAVE LOCAL
 function save(){
   localStorage.setItem("scrim",JSON.stringify(data));
 }
@@ -186,7 +194,7 @@ function render(){
   board();
 }
 
-// LEADERBOARD (FIXED SORT)
+// LEADERBOARD (SORT FIXED)
 function board(){
   let totals={};
 
