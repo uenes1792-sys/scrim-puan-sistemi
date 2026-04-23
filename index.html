@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>20msVIP SCRIM SYSTEM</title>
+    <title>20msVIP SCRIM SYSTEM - Full Hizalama</title>
     <style>
         body {
             background: #000;
@@ -12,25 +12,31 @@
             margin: 0;
             padding: 20px;
         }
-        h1 { color: #00ffcc; margin-bottom: 20px; }
-        .panel { background: #111; padding: 20px; border-radius: 10px; display: inline-block; border: 1px solid #333; }
-        input, button { padding: 10px; margin: 5px; border-radius: 5px; border: none; font-weight: bold; }
-        input { background: #222; color: white; width: 140px; }
-        button { cursor: pointer; transition: 0.2s; }
+        h1 { color: #00ffcc; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .panel { background: #111; padding: 25px; border-radius: 12px; display: inline-block; border: 1px solid #333; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        input, button { padding: 12px; margin: 5px; border-radius: 6px; border: none; font-weight: bold; font-size: 14px; }
+        input { background: #222; color: white; width: 150px; border: 1px solid #444; }
+        input:focus { outline: 2px solid #00ffcc; border-color: transparent; }
+        button { cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; }
         .add-btn { background: #00ffcc; color: #000; }
         .reset-btn { background: #ff4d4d; color: #fff; }
         .wa-btn { background: #25D366; color: #fff; }
         .export-btn { background: #00acee; color: #fff; }
-        button:hover { opacity: 0.8; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
 
         table {
             width: 95%;
-            margin: 20px auto;
+            margin: 25px auto;
             border-collapse: collapse;
             background: #111;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            overflow: hidden;
         }
-        th, td { border: 1px solid #333; padding: 10px; text-align: center; }
-        th { background: #00ffcc; color: black; }
+        th, td { border: 1px solid #222; padding: 12px; text-align: center; font-size: 14px; }
+        th { background: #1a1a1a; color: #00ffcc; font-weight: 600; text-transform: uppercase; }
+        tr:nth-child(even) { background: #171717; }
+        tr:hover { background: #222; }
     </style>
 </head>
 <body>
@@ -39,13 +45,13 @@
 
     <div class="panel">
         <input id="team" placeholder="Takım Adı">
-        <input id="rank" type="number" placeholder="Sıralama">
-        <input id="kill" type="number" placeholder="Kill">
+        <input id="rank" type="number" placeholder="Sıralama (1, 2, 3...)">
+        <input id="kill" type="number" placeholder="Toplam Kill">
         <br>
-        <button class="add-btn" onclick="add()">EKLE</button>
-        <button class="reset-btn" onclick="resetAll()">SIFIRLA</button>
-        <button class="wa-btn" onclick="sendWhatsApp()">WHATSAPP</button>
-        <button class="export-btn" onclick="exportImage()">📸 EXPORT PNG</button>
+        <button class="add-btn" onclick="add()">Ekle</button>
+        <button class="reset-btn" onclick="resetAll()">Sıfırla</button>
+        <button class="wa-btn" onclick="sendWhatsApp()">WhatsApp Mesajı</button>
+        <button class="export-btn" onclick="exportImage()">📸 PNG OLARAK KAYDET</button>
     </div>
 
     <table>
@@ -65,7 +71,7 @@
     <canvas id="canvas" width="1920" height="1080" style="display:none;"></canvas>
 
 <script>
-    let data = JSON.parse(localStorage.getItem("scrim_data")) || [];
+    let data = JSON.parse(localStorage.getItem("scrim_data_v4")) || [];
 
     function calc(rank, kill) {
         let p = 0;
@@ -100,7 +106,7 @@
         t.focus();
     }
 
-    function save() { localStorage.setItem("scrim_data", JSON.stringify(data)); }
+    function save() { localStorage.setItem("scrim_data_v4", JSON.stringify(data)); }
 
     function resetAll() {
         if (confirm("Veriler sıfırlansın mı?")) {
@@ -120,7 +126,7 @@
         });
 
         return Object.entries(t)
-            .sort((a, b) => b[1] - a[1])
+            .sort((a, b) => b[1] - a[1]) // Toplam puana göre sırala
             .map((x, i) => ({
                 pos: i + 1,
                 team: x[0],
@@ -142,9 +148,9 @@
 
     function sendWhatsApp() {
         let arr = getBoard();
-        let text = "🔥 *20msVIP GÜNLÜK SONUÇ*%0A%0A";
+        let text = "🔥 *20msVIP RESULT*%0A%0A";
         arr.forEach(d => {
-            text += `*${d.pos}.* ${d.team} | Total: ${d.total}%0A`;
+            text += `*${d.pos}.* ${d.team} | Total: ${d.total} | Kill: ${d.kill}%0A`;
         });
         window.open("https://wa.me/?text=" + text, "_blank");
     }
@@ -154,7 +160,7 @@
         let ctx = canvas.getContext("2d");
         let bg = new Image();
         
-        // Dosya ismini istediğin gibi sabit bıraktım
+        // Dosya ismi orijinaliyle aynı kalmalı
         bg.src = "IMG-20260423-WA0006.jpg"; 
 
         bg.onload = function() {
@@ -164,37 +170,43 @@
 
             let arr = getBoard();
 
+            // YAZI AYARLARI VE NETLİK
             ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 24px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
+            ctx.font = "bold 26px Arial, sans-serif"; // Daha kalın ve net font
+            ctx.textAlign = "center"; // Tüm sütunlar için ortalama
+            ctx.textBaseline = "middle"; // Satırları tam ortala
 
-            // Koordinatlar şablondaki kutucuklara göre ayarlandı
-            let startY = 328;   
-            let rowHeight = 49; 
+            // Başlangıç koordinatları (image_3.png'ye göre milimetrik)
+            let startY = 328;   // İlk takımın (Rank 1/Rank 14) Y koordinatı
+            let rowHeight = 49; // Satırlar arası boşluk
 
-            // SOL TARAF (1-13)
+            // SOL TABLO (1-13)
             arr.slice(0, 13).forEach((d, i) => {
                 let y = startY + (i * rowHeight);
-                ctx.fillText(d.team, 178, y); 
-                ctx.fillText(d.win ? "x"+d.win : "-", 298, y);
-                ctx.fillText(d.kill, 395, y);
-                ctx.fillText(d.rank, 502, y);
-                ctx.fillText(d.total, 615, y);
+                
+                // Koordinatlar sütunların tam orta noktalarıdır
+                ctx.fillText(d.team, 178, y);              // TEAM NAME
+                ctx.fillText(d.win ? "x"+d.win : "-", 298, y); // WWNC
+                ctx.fillText(d.kill, 395, y);              // KILL POINTS
+                ctx.fillText(d.rank, 502, y);              // RANK POINTS
+                ctx.fillText(d.total, 615, y);             // TOTAL POINTS
             });
 
-            // SAĞ TARAF (14-25)
+            // SAĞ TABLO (14-25)
             arr.slice(13, 25).forEach((d, i) => {
                 let y = startY + (i * rowHeight);
-                ctx.fillText(d.team, 742, y); 
-                ctx.fillText(d.win ? "x"+d.win : "-", 862, y);
-                ctx.fillText(d.kill, 959, y);
-                ctx.fillText(d.rank, 1066, y);
-                ctx.fillText(d.total, 1179, y);
+                
+                // Sağ tarafın koordinatları
+                ctx.fillText(d.team, 742, y);              // TEAM NAME
+                ctx.fillText(d.win ? "x"+d.win : "-", 862, y); // WWNC
+                ctx.fillText(d.kill, 959, y);              // KILL POINTS
+                ctx.fillText(d.rank, 1066, y);             // RANK POINTS
+                ctx.fillText(d.total, 1179, y);            // TOTAL POINTS
             });
 
+            // Resmi İndir
             let link = document.createElement("a");
-            link.download = "20msVIP_Result.png";
+            link.download = "20msVIP_Günün_Sonucu.png";
             link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
         };
