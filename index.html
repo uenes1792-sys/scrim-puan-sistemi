@@ -8,22 +8,26 @@
 body{
   margin:0;
   font-family:Arial;
-  background:linear-gradient(120deg,#000,#111,#000);
+  background:radial-gradient(circle,#111,#000);
   color:white;
   text-align:center;
 }
 
 h1{
-  margin-top:15px;
   color:#00ffcc;
   text-shadow:0 0 10px #00ffcc;
+  margin-top:15px;
 }
 
-input,select,button{
+input,button{
   padding:10px;
   margin:5px;
   border:none;
   border-radius:6px;
+}
+
+input{
+  width:180px;
 }
 
 button{
@@ -32,7 +36,7 @@ button{
 }
 
 .add{background:#00ffcc;}
-.reset{background:#ff0033;color:white;}
+.reset{background:red;color:white;}
 .wh{background:#25D366;color:white;}
 
 table{
@@ -41,7 +45,6 @@ table{
   margin-top:20px;
   border-collapse:collapse;
   background:#0d0d0d;
-  box-shadow:0 0 15px #00ffcc33;
 }
 
 th,td{
@@ -64,7 +67,8 @@ tr:hover{
 
 <h1>🔥 PRO SCRIM SYSTEM</h1>
 
-<select id="team"></select>
+<!-- TEAM NAME FREE INPUT -->
+<input id="team" placeholder="Team Name">
 <input id="rank" placeholder="Rank (1-20)">
 <input id="kill" placeholder="Kills">
 
@@ -104,19 +108,8 @@ tr:hover{
 
 <script>
 
-// 25 TEAM AUTO
-let teams = Array.from({length:25}, (_,i)=>"TEAM "+(i+1));
-
-// DATA STORAGE
+// DATA
 let data = JSON.parse(localStorage.getItem("scrim")) || [];
-
-// TEAM SELECT
-let select = document.getElementById("team");
-teams.forEach(t=>{
-  let opt = document.createElement("option");
-  opt.textContent = t;
-  select.appendChild(opt);
-});
 
 // POINT SYSTEM
 function calc(rank,kills){
@@ -136,6 +129,8 @@ function add(){
   let rank=parseInt(document.getElementById("rank").value);
   let kill=parseInt(document.getElementById("kill").value);
   let match=data.length+1;
+
+  if(!team) return alert("Enter team name!");
 
   data.push({
     team,
@@ -158,14 +153,14 @@ function del(i){
 
 // RESET
 function resetAll(){
-  if(confirm("Reset all data?")){
+  if(confirm("RESET ALL DATA?")){
     data=[];
     save();
     render();
   }
 }
 
-// SAVE LOCAL
+// SAVE LOCAL STORAGE
 function save(){
   localStorage.setItem("scrim",JSON.stringify(data));
 }
@@ -188,11 +183,10 @@ function render(){
   });
 
   document.getElementById("list").innerHTML=html;
-
   board();
 }
 
-// 🔥 FIXED LEADERBOARD (SORTED)
+// LEADERBOARD (FIXED SORT)
 function board(){
   let totals={};
 
