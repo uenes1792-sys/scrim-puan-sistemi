@@ -2,13 +2,13 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>20msVIP SCRIM SYSTEM - FINAL</title>
+<title>20msVIP SCRIM SYSTEM - FINAL FIXED</title>
 
 <style>
 body { background:#050505; color:#fff; font-family:'Arial Black'; text-align:center; padding:20px; }
 .container { background:#111; padding:25px; border-radius:15px; display:inline-block; border:2px solid #00ffcc; }
 input,button { padding:12px; margin:5px; border-radius:8px; border:none; font-weight:900; }
-input { background:#1a1a1a; color:#fff; width:140px; }
+input { background:#1a1a1a; color:#fff; width:100px; }
 button { cursor:pointer; }
 .add { background:#00ffcc; color:#000; }
 .reset { background:#ff3e3e; color:#fff; }
@@ -26,14 +26,26 @@ th { background:#00ffcc; color:#000; }
 <h1>🔥 20msVIP RESULT PANEL 🔥</h1>
 
 <div class="container">
+
 <input id="team" placeholder="TAKIM">
 <input id="rank" type="number" placeholder="SIRA">
-<input id="kill" type="number" placeholder="KILL">
+
+<br><br>
+
+<b>PLAYER KILLS</b><br>
+
+<input id="p1" type="number" placeholder="P1">
+<input id="p2" type="number" placeholder="P2">
+<input id="p3" type="number" placeholder="P3">
+<input id="p4" type="number" placeholder="P4">
+
 <br>
+
 <button class="add" onclick="add()">EKLE</button>
 <button class="reset" onclick="resetAll()">SIFIRLA</button>
 <button class="wa" onclick="sendWhatsApp()">WHATSAPP</button>
 <button class="export" onclick="exportImage()">PNG</button>
+
 </div>
 
 <table>
@@ -51,42 +63,63 @@ th { background:#00ffcc; color:#000; }
 
 let data = JSON.parse(localStorage.getItem("20ms_v7")) || [];
 
-function calc(rank, kill){
-let rp=0;
-if(rank==1) rp=15;
-else if(rank==2) rp=12;
-else if(rank==3) rp=10;
-else if(rank<=5) rp=8;
-else if(rank<=10) rp=4;
-else if(rank<=15) rp=2;
-return {total: rp+kill, rp};
+// 🔥 PUBG PUAN SİSTEMİ
+function getRankPoint(rank){
+if(rank==1) return 15;
+if(rank==2) return 12;
+if(rank==3) return 10;
+if(rank==4) return 8;
+if(rank==5) return 6;
+if(rank==6) return 4;
+if(rank==7) return 2;
+if(rank>=8 && rank<=12) return 1;
+return 0;
 }
 
+// 🔥 ADD (PLAYER KILL DESTEKLİ)
 function add(){
+
 let t=team.value.trim();
 let r=parseInt(rank.value);
-let k=parseInt(kill.value);
 
-if(!t||isNaN(r)||isNaN(k)) return alert("Eksik veri!");
+// boş = 0
+let p1v = Number(p1.value) || 0;
+let p2v = Number(p2.value) || 0;
+let p3v = Number(p3.value) || 0;
+let p4v = Number(p4.value) || 0;
 
-let res=calc(r,k);
+let totalKill = p1v + p2v + p3v + p4v;
 
-data.push({name:t.toUpperCase(), rank:r, kill:k, rp:res.rp, total:res.total});
+if(!t||isNaN(r)) return alert("Eksik veri!");
+
+data.push({
+name:t.toUpperCase(),
+rank:r,
+kill:totalKill
+});
+
 localStorage.setItem("20ms_v7",JSON.stringify(data));
 render();
 
-team.value=""; rank.value=""; kill.value="";
+// temizle
+team.value=""; rank.value="";
+p1.value=""; p2.value=""; p3.value=""; p4.value="";
 }
 
+// 🔥 DATA
 function getData(){
 let stats={};
 
 data.forEach(d=>{
+
+let rp = getRankPoint(d.rank);
+
 if(!stats[d.name]) stats[d.name]={total:0,k:0,rp:0,w:0};
 
-stats[d.name].total+=d.total || 0;
-stats[d.name].k+=d.kill || 0;
-stats[d.name].rp+=d.rp || 0;
+stats[d.name].k += d.kill || 0;
+stats[d.name].rp += rp;
+stats[d.name].total += (rp + (d.kill||0));
+
 if(d.rank==1) stats[d.name].w++;
 });
 
@@ -112,7 +145,7 @@ html+=`
 board.innerHTML=html;
 }
 
-// 🔥 WHATSAPP (NaN FIX)
+// 🔥 WHATSAPP
 function sendWhatsApp(){
 let list=getData();
 let msg="20msVIP DAILY RESULT\n\n";
@@ -120,12 +153,11 @@ let msg="20msVIP DAILY RESULT\n\n";
 list.forEach((x,i)=>{
 
 let w = x[1].w>0 ? "WWNC: x"+x[1].w+"\n":"";
-let rankVal = x[1].rp || 0;
 
 msg+=`${i+1}. ${x[0]}\n`;
 msg+=w;
 msg+=`Kill: ${x[1].k}\n`;
-msg+=`Rank: ${rankVal}\n`;
+msg+=`Rank: ${x[1].rp}\n`;
 msg+=`Total: ${x[1].total}\n\n`;
 });
 
@@ -140,7 +172,7 @@ render();
 }
 }
 
-// 🔥 PNG EXPORT (HİZALI)
+// 🔥 PNG EXPORT (AYNI)
 function exportImage(){
 
 let c=canvas;
@@ -185,7 +217,7 @@ ctx.fillText(x[0],col.name,y);
 ctx.font="900 30px Arial Black";
 ctx.fillText(x[1].w? "x"+x[1].w:"-",col.w,y);
 ctx.fillText(x[1].k,col.k,y);
-ctx.fillText(x[1].rp||0,col.r,y);
+ctx.fillText(x[1].rp,col.r,y);
 ctx.fillText(x[1].total,col.t,y);
 
 });
