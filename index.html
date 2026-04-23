@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scrim Puan Sistemi</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+      text-align: center;
+    }
+
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: 90px;
+    }
+
+    button {
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    table {
+      width: 90%;
+      margin: auto;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #444;
+      padding: 10px;
+    }
+
+    th {
+      background: #222;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🔥 PUBG Scrim Puan Sistemi</h2>
+
+<input id="team" placeholder="Takım">
+<input id="rank" placeholder="Sıra (1-20)">
+<input id="kill" placeholder="Kill">
+<br>
+<button onclick="ekle()">Ekle</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Takım</th>
+      <th>Sıra</th>
+      <th>Kill</th>
+      <th>Puan</th>
+      <th>Sil</th>
+    </tr>
+  </thead>
+  <tbody id="list"></tbody>
+</table>
+
+<h3 id="total"></h3>
+
+<script>
+let data = [];
+
+function puanHesap(rank, kill) {
+  let puan = 0;
+
+  if(rank == 1) puan = 15;
+  else if(rank == 2) puan = 12;
+  else if(rank == 3) puan = 10;
+  else if(rank <= 5) puan = 8;
+  else if(rank <= 10) puan = 4;
+  else if(rank <= 15) puan = 2;
+
+  return puan + kill;
+}
+
+function ekle() {
+  let team = document.getElementById("team").value;
+  let rank = parseInt(document.getElementById("rank").value);
+  let kill = parseInt(document.getElementById("kill").value);
+
+  let puan = puanHesap(rank, kill);
+
+  data.push({team, rank, kill, puan});
+
+  guncelle();
+}
+
+function sil(i) {
+  data.splice(i, 1);
+  guncelle();
+}
+
+function guncelle() {
+  let html = "";
+  let toplam = 0;
+
+  data.forEach((d, i) => {
+    toplam += d.puan;
+
+    html += `
+      <tr>
+        <td>${d.team}</td>
+        <td>${d.rank}</td>
+        <td>${d.kill}</td>
+        <td>${d.puan}</td>
+        <td><button onclick="sil(${i})">X</button></td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("list").innerHTML = html;
+  document.getElementById("total").innerText = "Toplam Puan: " + toplam;
+}
+</script>
+
+</body>
+</html>
