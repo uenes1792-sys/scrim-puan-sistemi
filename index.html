@@ -12,7 +12,9 @@ body{
   text-align:center;
 }
 
-h1{color:#00ffcc;}
+h1{
+  color:#00ffcc;
+}
 
 input,button{
   padding:10px;
@@ -40,9 +42,9 @@ th{
 
 <body>
 
-<h1>🔥 20msVIP PANEL</h1>
+<h1>🔥 20msVIP SCRIM PANEL</h1>
 
-<input id="team" placeholder="Team">
+<input id="team" placeholder="Team Name">
 <input id="rank" placeholder="Rank">
 <input id="kill" placeholder="Kills">
 
@@ -51,7 +53,7 @@ th{
 <button onclick="add()">ADD</button>
 <button onclick="resetAll()">RESET</button>
 <button onclick="sendWhatsApp()">WHATSAPP</button>
-<button onclick="exportImage()">EXPORT PNG</button>
+<button onclick="exportImage()">📸 EXPORT PNG</button>
 
 <table>
 <thead>
@@ -73,7 +75,7 @@ th{
 
 let data = JSON.parse(localStorage.getItem("scrim")) || [];
 
-function calc(rank,k){
+function calc(rank, kill){
   let p=0;
   if(rank==1)p=15;
   else if(rank==2)p=12;
@@ -81,26 +83,32 @@ function calc(rank,k){
   else if(rank<=5)p=8;
   else if(rank<=10)p=4;
   else if(rank<=15)p=2;
-  return p+k;
+  return p + kill;
 }
 
 function add(){
-  let team=document.getElementById("team").value.trim();
-  let rank=parseInt(document.getElementById("rank").value);
-  let kill=parseInt(document.getElementById("kill").value);
+  let teamInput=document.getElementById("team");
+  let rankInput=document.getElementById("rank");
+  let killInput=document.getElementById("kill");
+
+  let team=teamInput.value.trim();
+  let rank=parseInt(rankInput.value);
+  let kill=parseInt(killInput.value);
 
   if(!team || isNaN(rank) || isNaN(kill)){
-    alert("Fill all fields");
+    alert("Fill all fields!");
     return;
   }
 
   data.push({team,rank,kill,point:calc(rank,kill)});
+
   save();
   render();
 
-  team.value="";
-  rank.value="";
-  kill.value="";
+  teamInput.value="";
+  rankInput.value="";
+  killInput.value="";
+  teamInput.focus();
 }
 
 function save(){
@@ -108,7 +116,7 @@ function save(){
 }
 
 function resetAll(){
-  if(confirm("RESET?")){
+  if(confirm("Reset all data?")){
     data=[];
     save();
     render();
@@ -116,24 +124,27 @@ function resetAll(){
 }
 
 function getBoard(){
-  let t={},k={},r={},w={};
+  let totals={},kills={},ranks={},wins={};
 
   data.forEach(d=>{
-    t[d.team]=(t[d.team]||0)+d.point;
-    k[d.team]=(k[d.team]||0)+d.kill;
-    r[d.team]=(r[d.team]||0)+(d.point-d.kill);
-    if(d.rank==1) w[d.team]=(w[d.team]||0)+1;
+    totals[d.team]=(totals[d.team]||0)+d.point;
+    kills[d.team]=(kills[d.team]||0)+d.kill;
+    ranks[d.team]=(ranks[d.team]||0)+(d.point-d.kill);
+
+    if(d.rank==1){
+      wins[d.team]=(wins[d.team]||0)+1;
+    }
   });
 
-  return Object.entries(t)
+  return Object.entries(totals)
     .sort((a,b)=>b[1]-a[1])
     .map((x,i)=>({
       pos:i+1,
       team:x[0],
       total:x[1],
-      kill:k[x[0]]||0,
-      rank:r[x[0]]||0,
-      win:w[x[0]]||0
+      kill:kills[x[0]]||0,
+      rank:ranks[x[0]]||0,
+      win:wins[x[0]]||0
     }));
 }
 
@@ -176,49 +187,53 @@ function exportImage(){
   let ctx=canvas.getContext("2d");
 
   let bg=new Image();
-  bg.src="bg.png"; // repo'ya yüklediğin görsel
+  bg.src="bg.png";
 
   bg.onload=function(){
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.drawImage(bg,0,0,canvas.width,canvas.height);
+    ctx.clearRect(0,0,1080,1920);
+    ctx.drawImage(bg,0,0,1080,1920);
 
     let arr=getBoard();
 
     ctx.fillStyle="#ffffff";
-    ctx.font="24px Arial";
+    ctx.font="26px Arial";
 
-    let startY=520;
+    let startY=500;
 
-    // SOL (1-13)
+    // 🔥 SOL TARAF (1-13)
     arr.slice(0,13).forEach((d,i)=>{
-      let y=startY+(i*55);
+      let y=startY+(i*60);
 
-      ctx.fillText(d.pos,70,y);
-      ctx.fillText(d.team,130,y);
-      ctx.fillText(d.win?"x"+d.win:"-",380,y);
-      ctx.fillText(d.kill,470,y);
-      ctx.fillText(d.rank,560,y);
-      ctx.fillText(d.total,650,y);
+      ctx.fillText(d.pos,80,y);
+      ctx.fillText(d.team,150,y);
+      ctx.fillText(d.win?"x"+d.win:"-",420,y);
+      ctx.fillText(d.kill,520,y);
+      ctx.fillText(d.rank,620,y);
+      ctx.fillText(d.total,720,y);
     });
 
-    // SAĞ (14-25)
+    // 🔥 SAĞ TARAF (14-25)
     arr.slice(13,25).forEach((d,i)=>{
-      let y=startY+(i*55);
+      let y=startY+(i*60);
 
-      ctx.fillText(d.pos,700,y);
-      ctx.fillText(d.team,760,y);
-      ctx.fillText(d.win?"x"+d.win:"-",1000,y);
-      ctx.fillText(d.kill,1090,y);
-      ctx.fillText(d.rank,1180,y);
-      ctx.fillText(d.total,1270,y);
+      ctx.fillText(d.pos,760,y);
+      ctx.fillText(d.team,830,y);
+      ctx.fillText(d.win?"x"+d.win:"-",1100,y);
+      ctx.fillText(d.kill,1200,y);
+      ctx.fillText(d.rank,1300,y);
+      ctx.fillText(d.total,1400,y);
     });
 
     let link=document.createElement("a");
     link.download="result.png";
     link.href=canvas.toDataURL("image/png");
     link.click();
-  }
+  };
+
+  bg.onerror=function(){
+    alert("bg.png bulunamadı!");
+  };
 }
 
 render();
