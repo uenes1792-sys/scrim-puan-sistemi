@@ -1,124 +1,201 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Scrim Puan Sistemi</title>
-  <style>
-    body {
-      font-family: Arial;
-      background: #111;
-      color: white;
-      text-align: center;
-    }
+<meta charset="UTF-8">
+<title>Scrim Control Panel</title>
 
-    input {
-      padding: 10px;
-      margin: 5px;
-      width: 90px;
-    }
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background: radial-gradient(circle at top, #1a1a1a, #000);
+  color:#fff;
+  text-align:center;
+}
 
-    button {
-      padding: 10px;
-      margin: 5px;
-      cursor: pointer;
-    }
+/* HEADER */
+h1 {
+  margin-top:20px;
+  color:#00ffcc;
+  text-shadow:0 0 10px #00ffcc;
+}
 
-    table {
-      width: 90%;
-      margin: auto;
-      margin-top: 20px;
-      border-collapse: collapse;
-    }
+/* INPUT AREA */
+input {
+  padding:12px;
+  margin:6px;
+  width:120px;
+  border:none;
+  border-radius:8px;
+  outline:none;
+}
 
-    th, td {
-      border: 1px solid #444;
-      padding: 10px;
-    }
+button {
+  padding:12px 18px;
+  margin:5px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-    th {
-      background: #222;
-    }
-  </style>
+.add {
+  background:#00ffcc;
+  color:#000;
+  box-shadow:0 0 10px #00ffcc;
+}
+
+.reset {
+  background:#ff0033;
+  color:#fff;
+  box-shadow:0 0 10px #ff0033;
+}
+
+/* TABLE */
+table {
+  width:95%;
+  margin:auto;
+  margin-top:20px;
+  border-collapse:collapse;
+  background:#111;
+  box-shadow:0 0 20px rgba(0,255,204,0.2);
+  border-radius:10px;
+  overflow:hidden;
+}
+
+th {
+  background:#00ffcc;
+  color:#000;
+  padding:10px;
+}
+
+td {
+  padding:10px;
+  border-bottom:1px solid #222;
+}
+
+tr:hover {
+  background:#1f1f1f;
+}
+
+/* DELETE BUTTON */
+.del {
+  background:#ff0033;
+  color:#fff;
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+}
+</style>
 </head>
 
 <body>
 
-<h2>🔥 PUBG Scrim Puan Sistemi</h2>
+<h1>🔥 SCRIM CONTROL PANEL</h1>
 
-<input id="team" placeholder="Takım">
-<input id="rank" placeholder="Sıra (1-20)">
-<input id="kill" placeholder="Kill">
+<input id="team" placeholder="Team">
+<input id="rank" placeholder="Rank">
+<input id="kill" placeholder="Kills">
+
 <br>
-<button onclick="ekle()">Ekle</button>
+
+<button class="add" onclick="add()">ADD</button>
+<button class="reset" onclick="resetAll()">RESET</button>
 
 <table>
-  <thead>
-    <tr>
-      <th>Takım</th>
-      <th>Sıra</th>
-      <th>Kill</th>
-      <th>Puan</th>
-      <th>Sil</th>
-    </tr>
-  </thead>
-  <tbody id="list"></tbody>
+<thead>
+<tr>
+<th>Team</th>
+<th>Rank</th>
+<th>Kills</th>
+<th>Points</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="list"></tbody>
 </table>
 
 <h3 id="total"></h3>
 
 <script>
-let data = [];
 
-function puanHesap(rank, kill) {
-  let puan = 0;
+// LOAD DATA
+let data = JSON.parse(localStorage.getItem("scrim")) || [];
 
-  if(rank == 1) puan = 15;
-  else if(rank == 2) puan = 12;
-  else if(rank == 3) puan = 10;
-  else if(rank <= 5) puan = 8;
-  else if(rank <= 10) puan = 4;
-  else if(rank <= 15) puan = 2;
+function calc(rank, kill){
+  let p = 0;
 
-  return puan + kill;
+  if(rank==1) p=15;
+  else if(rank==2) p=12;
+  else if(rank==3) p=10;
+  else if(rank<=5) p=8;
+  else if(rank<=10) p=4;
+  else if(rank<=15) p=2;
+
+  return p + kill;
 }
 
-function ekle() {
+// ADD TEAM
+function add(){
   let team = document.getElementById("team").value;
   let rank = parseInt(document.getElementById("rank").value);
   let kill = parseInt(document.getElementById("kill").value);
 
-  let puan = puanHesap(rank, kill);
+  let point = calc(rank, kill);
 
-  data.push({team, rank, kill, puan});
+  data.push({team, rank, kill, point});
 
-  guncelle();
+  save();
+  render();
 }
 
-function sil(i) {
-  data.splice(i, 1);
-  guncelle();
+// DELETE
+function del(i){
+  data.splice(i,1);
+  save();
+  render();
 }
 
-function guncelle() {
+// RESET ALL
+function resetAll(){
+  if(confirm("Reset all data?")){
+    data = [];
+    save();
+    render();
+  }
+}
+
+// SAVE TO PHONE MEMORY
+function save(){
+  localStorage.setItem("scrim", JSON.stringify(data));
+}
+
+// SHOW DATA
+function render(){
   let html = "";
-  let toplam = 0;
+  let total = 0;
 
-  data.forEach((d, i) => {
-    toplam += d.puan;
+  data.forEach((d,i)=>{
+    total += d.point;
 
     html += `
       <tr>
         <td>${d.team}</td>
         <td>${d.rank}</td>
         <td>${d.kill}</td>
-        <td>${d.puan}</td>
-        <td><button onclick="sil(${i})">X</button></td>
+        <td>${d.point}</td>
+        <td><button class="del" onclick="del(${i})">X</button></td>
       </tr>
     `;
   });
 
   document.getElementById("list").innerHTML = html;
-  document.getElementById("total").innerText = "Toplam Puan: " + toplam;
+  document.getElementById("total").innerText = "TOTAL POINTS: " + total;
 }
+
+render();
+
 </script>
 
 </body>
