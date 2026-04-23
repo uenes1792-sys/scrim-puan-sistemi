@@ -103,8 +103,10 @@ function save(){
 }
 
 function resetAll(){
-  if(confirm("Reset?")){
-    data=[]; save(); render();
+  if(confirm("Reset all data?")){
+    data=[];
+    save();
+    render();
   }
 }
 
@@ -169,37 +171,42 @@ function exportImage(){
   let ctx=canvas.getContext("2d");
 
   let bg=new Image();
-  bg.src="IMG-20260423-WA0006.jpg"; // 🔥 SENİN DOSYA
+  bg.src="IMG-20260423-WA0006.jpg";
 
   bg.onload=function(){
 
+    ctx.clearRect(0,0,1080,1920);
     ctx.drawImage(bg,0,0,1080,1920);
 
     let arr=getBoard();
 
     ctx.fillStyle="#ffffff";
-    ctx.font="26px Arial";
+    ctx.font="bold 28px Arial";
+    ctx.textAlign="center";
 
-    let startY=500;
+    let startY=520;
+    let rowHeight=65;
 
+    // SOL
     arr.slice(0,13).forEach((d,i)=>{
-      let y=startY+(i*60);
-      ctx.fillText(d.pos,80,y);
-      ctx.fillText(d.team,150,y);
-      ctx.fillText(d.win?"x"+d.win:"-",420,y);
-      ctx.fillText(d.kill,520,y);
-      ctx.fillText(d.rank,620,y);
-      ctx.fillText(d.total,720,y);
+      let y=startY+(i*rowHeight);
+
+      ctx.fillText(d.team,260,y);
+      ctx.fillText(d.win?"x"+d.win:"-",480,y);
+      ctx.fillText(d.kill,580,y);
+      ctx.fillText(d.rank,680,y);
+      ctx.fillText(d.total,800,y);
     });
 
+    // SAĞ
     arr.slice(13,25).forEach((d,i)=>{
-      let y=startY+(i*60);
-      ctx.fillText(d.pos,760,y);
-      ctx.fillText(d.team,830,y);
-      ctx.fillText(d.win?"x"+d.win:"-",1100,y);
-      ctx.fillText(d.kill,1200,y);
-      ctx.fillText(d.rank,1300,y);
-      ctx.fillText(d.total,1400,y);
+      let y=startY+(i*rowHeight);
+
+      ctx.fillText(d.team,1000,y);
+      ctx.fillText(d.win?"x"+d.win:"-",1220,y);
+      ctx.fillText(d.kill,1320,y);
+      ctx.fillText(d.rank,1420,y);
+      ctx.fillText(d.total,1520,y);
     });
 
     let link=document.createElement("a");
