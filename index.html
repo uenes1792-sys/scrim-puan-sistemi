@@ -2,240 +2,223 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>PRO SCRIM SYSTEM</title>
+<title>20msVIP SCRIM SYSTEM</title>
 
 <style>
 body{
-  margin:0;
-  font-family:Arial;
-  background:radial-gradient(circle,#111,#000);
+  background:#000;
   color:white;
+  font-family:Arial;
   text-align:center;
 }
 
-h1{
-  color:#00ffcc;
-  text-shadow:0 0 10px #00ffcc;
-  margin-top:15px;
-}
+h1{color:#00ffcc;}
 
 input,button{
   padding:10px;
   margin:5px;
-  border:none;
-  border-radius:6px;
 }
-
-input{
-  width:180px;
-}
-
-button{
-  cursor:pointer;
-  font-weight:bold;
-}
-
-.add{background:#00ffcc;}
-.reset{background:red;color:white;}
-.wh{background:#25D366;color:white;}
 
 table{
   width:95%;
   margin:auto;
   margin-top:20px;
   border-collapse:collapse;
-  background:#0d0d0d;
 }
 
 th,td{
-  border:1px solid #222;
-  padding:8px;
+  border:1px solid #333;
+  padding:6px;
 }
 
 th{
   background:#00ffcc;
   color:black;
 }
-
-tr:hover{
-  background:#1a1a1a;
-}
 </style>
 </head>
 
 <body>
 
-<h1>🔥 PRO SCRIM SYSTEM</h1>
+<h1>🔥 20msVIP PANEL</h1>
 
-<input id="team" placeholder="Team Name">
-<input id="rank" placeholder="Rank (1-20)">
+<input id="team" placeholder="Team">
+<input id="rank" placeholder="Rank">
 <input id="kill" placeholder="Kills">
 
 <br>
 
-<button class="add" onclick="add()">ADD MATCH</button>
-<button class="reset" onclick="resetAll()">RESET</button>
-<button class="wh" onclick="sendWhatsApp()">WHATSAPP RESULT</button>
-
-<table>
-<thead>
-<tr>
-<th>Team</th>
-<th>Match</th>
-<th>Rank</th>
-<th>Kills</th>
-<th>Points</th>
-<th>Delete</th>
-</tr>
-</thead>
-
-<tbody id="list"></tbody>
-</table>
-
-<h2>🏆 LEADERBOARD</h2>
+<button onclick="add()">ADD</button>
+<button onclick="resetAll()">RESET</button>
+<button onclick="sendWhatsApp()">WHATSAPP</button>
+<button onclick="exportImage()">EXPORT PNG</button>
 
 <table>
 <thead>
 <tr>
 <th>#</th>
 <th>Team</th>
-<th>Total Points</th>
+<th>WWNC</th>
+<th>Kill</th>
+<th>Rank</th>
+<th>Total</th>
 </tr>
 </thead>
 <tbody id="board"></tbody>
 </table>
 
+<canvas id="canvas" width="1080" height="1920" style="display:none;"></canvas>
+
 <script>
 
-// DATA
 let data = JSON.parse(localStorage.getItem("scrim")) || [];
 
-// POINT SYSTEM
-function calc(rank,kills){
+function calc(rank,k){
   let p=0;
-  if(rank==1) p=15;
-  else if(rank==2) p=12;
-  else if(rank==3) p=10;
-  else if(rank<=5) p=8;
-  else if(rank<=10) p=4;
-  else if(rank<=15) p=2;
-  return p + (kills || 0);
+  if(rank==1)p=15;
+  else if(rank==2)p=12;
+  else if(rank==3)p=10;
+  else if(rank<=5)p=8;
+  else if(rank<=10)p=4;
+  else if(rank<=15)p=2;
+  return p+k;
 }
 
-// ADD MATCH
 function add(){
   let team=document.getElementById("team").value.trim();
   let rank=parseInt(document.getElementById("rank").value);
   let kill=parseInt(document.getElementById("kill").value);
 
   if(!team || isNaN(rank) || isNaN(kill)){
-    alert("Lütfen tüm alanları doğru doldur!");
+    alert("Fill all fields");
     return;
   }
 
-  let match=data.length+1;
-
-  data.push({
-    team,
-    rank,
-    kill,
-    match,
-    point:calc(rank,kill)
-  });
-
+  data.push({team,rank,kill,point:calc(rank,kill)});
   save();
   render();
 
-  // 🔥 INPUT TEMİZLE
-  document.getElementById("team").value = "";
-  document.getElementById("rank").value = "";
-  document.getElementById("kill").value = "";
+  team.value="";
+  rank.value="";
+  kill.value="";
 }
 
-// DELETE
-function del(i){
-  data.splice(i,1);
-  save();
-  render();
+function save(){
+  localStorage.setItem("scrim",JSON.stringify(data));
 }
 
-// RESET ALL
 function resetAll(){
-  if(confirm("RESET ALL DATA?")){
+  if(confirm("RESET?")){
     data=[];
     save();
     render();
   }
 }
 
-// SAVE LOCAL
-function save(){
-  localStorage.setItem("scrim",JSON.stringify(data));
-}
-
-// MATCH TABLE
-function render(){
-  let html="";
-
-  data.forEach((d,i)=>{
-    html+=`
-      <tr>
-        <td>${d.team}</td>
-        <td>${d.match}</td>
-        <td>${d.rank}</td>
-        <td>${d.kill}</td>
-        <td>${d.point}</td>
-        <td><button onclick="del(${i})">X</button></td>
-      </tr>
-    `;
-  });
-
-  document.getElementById("list").innerHTML=html;
-  board();
-}
-
-// LEADERBOARD (SORT FIXED)
-function board(){
-  let totals={};
+function getBoard(){
+  let t={},k={},r={},w={};
 
   data.forEach(d=>{
-    totals[d.team]=(totals[d.team]||0)+d.point;
+    t[d.team]=(t[d.team]||0)+d.point;
+    k[d.team]=(k[d.team]||0)+d.kill;
+    r[d.team]=(r[d.team]||0)+(d.point-d.kill);
+    if(d.rank==1) w[d.team]=(w[d.team]||0)+1;
   });
 
-  let sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  return Object.entries(t)
+    .sort((a,b)=>b[1]-a[1])
+    .map((x,i)=>({
+      pos:i+1,
+      team:x[0],
+      total:x[1],
+      kill:k[x[0]]||0,
+      rank:r[x[0]]||0,
+      win:w[x[0]]||0
+    }));
+}
 
+function render(){
+  let arr=getBoard();
   let html="";
 
-  sorted.forEach((t,i)=>{
+  arr.forEach(d=>{
     html+=`
-      <tr>
-        <td>${i+1}</td>
-        <td>${t[0]}</td>
-        <td>${t[1]}</td>
-      </tr>
-    `;
+    <tr>
+      <td>${d.pos}</td>
+      <td>${d.team}</td>
+      <td>${d.win?"x"+d.win:"-"}</td>
+      <td>${d.kill}</td>
+      <td>${d.rank}</td>
+      <td>${d.total}</td>
+    </tr>`;
   });
 
   document.getElementById("board").innerHTML=html;
 }
 
-// WHATSAPP RESULT
 function sendWhatsApp(){
-  let text="🔥 SCRIM RESULT%0A";
+  let arr=getBoard();
+  let text="🔥 20msVIP RESULT%0A%0A";
 
-  let totals={};
-
-  data.forEach(d=>{
-    totals[d.team]=(totals[d.team]||0)+d.point;
-  });
-
-  let sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-
-  sorted.forEach((t,i)=>{
-    text+=`${i+1}. ${t[0]} - ${t[1]} pts%0A`;
+  arr.forEach(d=>{
+    text+=`${d.pos}. ${d.team} ${d.win?"x"+d.win:""}%0A`;
+    text+=`Kill: ${d.kill}%0A`;
+    text+=`Rank: ${d.rank}%0A`;
+    text+=`Total: ${d.total}%0A%0A`;
   });
 
   window.open("https://wa.me/?text="+text,"_blank");
+}
+
+function exportImage(){
+
+  let canvas=document.getElementById("canvas");
+  let ctx=canvas.getContext("2d");
+
+  let bg=new Image();
+  bg.src="bg.png"; // repo'ya yüklediğin görsel
+
+  bg.onload=function(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(bg,0,0,canvas.width,canvas.height);
+
+    let arr=getBoard();
+
+    ctx.fillStyle="#ffffff";
+    ctx.font="24px Arial";
+
+    let startY=520;
+
+    // SOL (1-13)
+    arr.slice(0,13).forEach((d,i)=>{
+      let y=startY+(i*55);
+
+      ctx.fillText(d.pos,70,y);
+      ctx.fillText(d.team,130,y);
+      ctx.fillText(d.win?"x"+d.win:"-",380,y);
+      ctx.fillText(d.kill,470,y);
+      ctx.fillText(d.rank,560,y);
+      ctx.fillText(d.total,650,y);
+    });
+
+    // SAĞ (14-25)
+    arr.slice(13,25).forEach((d,i)=>{
+      let y=startY+(i*55);
+
+      ctx.fillText(d.pos,700,y);
+      ctx.fillText(d.team,760,y);
+      ctx.fillText(d.win?"x"+d.win:"-",1000,y);
+      ctx.fillText(d.kill,1090,y);
+      ctx.fillText(d.rank,1180,y);
+      ctx.fillText(d.total,1270,y);
+    });
+
+    let link=document.createElement("a");
+    link.download="result.png";
+    link.href=canvas.toDataURL("image/png");
+    link.click();
+  }
 }
 
 render();
