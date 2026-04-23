@@ -11,28 +11,18 @@ body{
   font-family:Arial;
   text-align:center;
 }
-
-h1{
-  color:#00ffcc;
-}
-
-input,button{
-  padding:10px;
-  margin:5px;
-}
-
+h1{color:#00ffcc;}
+input,button{padding:10px;margin:5px;}
 table{
   width:95%;
   margin:auto;
   margin-top:20px;
   border-collapse:collapse;
 }
-
 th,td{
   border:1px solid #333;
   padding:6px;
 }
-
 th{
   background:#00ffcc;
   color:black;
@@ -87,13 +77,13 @@ function calc(rank, kill){
 }
 
 function add(){
-  let teamInput=document.getElementById("team");
-  let rankInput=document.getElementById("rank");
-  let killInput=document.getElementById("kill");
+  let t=document.getElementById("team");
+  let r=document.getElementById("rank");
+  let k=document.getElementById("kill");
 
-  let team=teamInput.value.trim();
-  let rank=parseInt(rankInput.value);
-  let kill=parseInt(killInput.value);
+  let team=t.value.trim();
+  let rank=parseInt(r.value);
+  let kill=parseInt(k.value);
 
   if(!team || isNaN(rank) || isNaN(kill)){
     alert("Fill all fields!");
@@ -101,14 +91,11 @@ function add(){
   }
 
   data.push({team,rank,kill,point:calc(rank,kill)});
-
   save();
   render();
 
-  teamInput.value="";
-  rankInput.value="";
-  killInput.value="";
-  teamInput.focus();
+  t.value=""; r.value=""; k.value="";
+  t.focus();
 }
 
 function save(){
@@ -116,36 +103,31 @@ function save(){
 }
 
 function resetAll(){
-  if(confirm("Reset all data?")){
-    data=[];
-    save();
-    render();
+  if(confirm("Reset?")){
+    data=[]; save(); render();
   }
 }
 
 function getBoard(){
-  let totals={},kills={},ranks={},wins={};
+  let t={},k={},r={},w={};
 
   data.forEach(d=>{
-    totals[d.team]=(totals[d.team]||0)+d.point;
-    kills[d.team]=(kills[d.team]||0)+d.kill;
-    ranks[d.team]=(ranks[d.team]||0)+(d.point-d.kill);
-
-    if(d.rank==1){
-      wins[d.team]=(wins[d.team]||0)+1;
-    }
+    t[d.team]=(t[d.team]||0)+d.point;
+    k[d.team]=(k[d.team]||0)+d.kill;
+    r[d.team]=(r[d.team]||0)+(d.point-d.kill);
+    if(d.rank==1) w[d.team]=(w[d.team]||0)+1;
   });
 
-  return Object.entries(totals)
-    .sort((a,b)=>b[1]-a[1])
-    .map((x,i)=>({
-      pos:i+1,
-      team:x[0],
-      total:x[1],
-      kill:kills[x[0]]||0,
-      rank:ranks[x[0]]||0,
-      win:wins[x[0]]||0
-    }));
+  return Object.entries(t)
+  .sort((a,b)=>b[1]-a[1])
+  .map((x,i)=>({
+    pos:i+1,
+    team:x[0],
+    total:x[1],
+    kill:k[x[0]]||0,
+    rank:r[x[0]]||0,
+    win:w[x[0]]||0
+  }));
 }
 
 function render(){
@@ -187,11 +169,10 @@ function exportImage(){
   let ctx=canvas.getContext("2d");
 
   let bg=new Image();
-  bg.src="bg.png";
+  bg.src="IMG-20260423-WA0006.jpg"; // 🔥 SENİN DOSYA
 
   bg.onload=function(){
 
-    ctx.clearRect(0,0,1080,1920);
     ctx.drawImage(bg,0,0,1080,1920);
 
     let arr=getBoard();
@@ -201,10 +182,8 @@ function exportImage(){
 
     let startY=500;
 
-    // 🔥 SOL TARAF (1-13)
     arr.slice(0,13).forEach((d,i)=>{
       let y=startY+(i*60);
-
       ctx.fillText(d.pos,80,y);
       ctx.fillText(d.team,150,y);
       ctx.fillText(d.win?"x"+d.win:"-",420,y);
@@ -213,10 +192,8 @@ function exportImage(){
       ctx.fillText(d.total,720,y);
     });
 
-    // 🔥 SAĞ TARAF (14-25)
     arr.slice(13,25).forEach((d,i)=>{
       let y=startY+(i*60);
-
       ctx.fillText(d.pos,760,y);
       ctx.fillText(d.team,830,y);
       ctx.fillText(d.win?"x"+d.win:"-",1100,y);
@@ -229,10 +206,6 @@ function exportImage(){
     link.download="result.png";
     link.href=canvas.toDataURL("image/png");
     link.click();
-  };
-
-  bg.onerror=function(){
-    alert("bg.png bulunamadı!");
   };
 }
 
