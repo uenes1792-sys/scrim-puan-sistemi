@@ -44,7 +44,6 @@ input{
   text-align:center;
 }
 
-/* 🔥 PROFESYONEL MATCH UI */
 .match{
   border:1px solid #222;
   margin:12px;
@@ -70,7 +69,6 @@ input{
   gap:5px;
 }
 
-/* buton */
 button{
   padding:10px;
   margin:5px;
@@ -85,7 +83,6 @@ button{
 .wa{background:#25D366;width:100%;}
 .export{background:#00acee;width:100%;}
 
-/* tablo */
 table{
   width:95%;
   margin:25px auto;
@@ -102,7 +99,6 @@ td{
   padding:10px;
 }
 
-/* MVP */
 tr:nth-child(1){color:var(--gold);font-weight:900;}
 tr:nth-child(2){color:var(--silver);font-weight:800;}
 tr:nth-child(3){color:var(--bronze);font-weight:800;}
@@ -137,11 +133,14 @@ tr:nth-child(3){color:var(--bronze);font-weight:800;}
 <div class="match">
 <div class="match-title">🎮 MATCH 2</div>
 <div class="label">🏆 Rank</div>
-<input id="r2">
+<input id="r2" placeholder="Sıra">
 
 <div class="label">🔫 Player Kills</div>
 <div class="players">
-<input id="m2p1"><input id="m2p2"><input id="m2p3"><input id="m2p4">
+<input id="m2p1" placeholder="P1">
+<input id="m2p2" placeholder="P2">
+<input id="m2p3" placeholder="P3">
+<input id="m2p4" placeholder="P4">
 </div>
 </div>
 
@@ -149,11 +148,14 @@ tr:nth-child(3){color:var(--bronze);font-weight:800;}
 <div class="match">
 <div class="match-title">🎮 MATCH 3</div>
 <div class="label">🏆 Rank</div>
-<input id="r3">
+<input id="r3" placeholder="Sıra">
 
 <div class="label">🔫 Player Kills</div>
 <div class="players">
-<input id="m3p1"><input id="m3p2"><input id="m3p3"><input id="m3p4">
+<input id="m3p1" placeholder="P1">
+<input id="m3p2" placeholder="P2">
+<input id="m3p3" placeholder="P3">
+<input id="m3p4" placeholder="P4">
 </div>
 </div>
 
@@ -161,15 +163,17 @@ tr:nth-child(3){color:var(--bronze);font-weight:800;}
 <div class="match">
 <div class="match-title">🎮 MATCH 4</div>
 <div class="label">🏆 Rank</div>
-<input id="r4">
+<input id="r4" placeholder="Sıra">
 
 <div class="label">🔫 Player Kills</div>
 <div class="players">
-<input id="m4p1"><input id="m4p2"><input id="m4p3"><input id="m4p4">
+<input id="m4p1" placeholder="P1">
+<input id="m4p2" placeholder="P2">
+<input id="m4p3" placeholder="P3">
+<input id="m4p4" placeholder="P4">
 </div>
 </div>
 
-<!-- BONUS -->
 <div class="match">
 <div class="label">➕➖ EXTRA PUAN</div>
 <input id="bonus" placeholder="+">
@@ -193,7 +197,7 @@ tr:nth-child(3){color:var(--bronze);font-weight:800;}
 </table>
 
 <script>
-
+// JS KISMI AYNI (DEĞİŞMEDİ)
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 
 function rp(r){
@@ -257,13 +261,9 @@ document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
 function render(){
-
 let sorted=[...data].sort((a,b)=>b.t-a.t);
-
 let html="";
-
 sorted.forEach((x,i)=>{
-
 let extra="";
 if(x.b>0) extra+=" +"+x.b;
 if(x.p>0) extra+=" -"+x.p;
@@ -278,20 +278,14 @@ html+=`
 <td>${x.t}${extra}</td>
 </tr>`;
 });
-
 board.innerHTML=html;
 }
 
 function sendWhatsApp(){
-
 let sorted=[...data].sort((a,b)=>b.t-a.t);
-
 let msg="20msVIP DAILY RESULT\n\n";
-
 sorted.forEach((x,i)=>{
-
 let mvp = (i<3) ? " (MVP)" : "";
-
 let extra="";
 if(x.b>0) extra+=" +"+x.b;
 if(x.p>0) extra+=" -"+x.p;
@@ -300,9 +294,7 @@ msg+=`${i+1}. ${x.name}${mvp}\n`;
 msg+=`Kill: ${x.k}\n`;
 msg+=`Rank: ${x.r}\n`;
 msg+=`Total: ${x.t}${extra}\n\n`;
-
 });
-
 window.open("https://wa.me/?text="+encodeURIComponent(msg));
 }
 
@@ -315,7 +307,6 @@ board.innerHTML="";
 function exportImage(){
 let c=canvas;
 let ctx=c.getContext("2d");
-
 ctx.fillStyle="#000";
 ctx.fillRect(0,0,1920,1080);
 
@@ -325,7 +316,6 @@ ctx.fillStyle="#fff";
 ctx.font="30px Arial";
 
 let y=100;
-
 sorted.forEach((x,i)=>{
 ctx.fillText(`${i+1}. ${x.name} - ${x.t}`,100,y);
 y+=40;
@@ -338,7 +328,6 @@ link.click();
 }
 
 render();
-
 </script>
 </body>
 </html>
