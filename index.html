@@ -118,7 +118,6 @@ tr:nth-child(3){color:var(--bronze);font-weight:800;}
 
 <input id="team" placeholder="TEAM">
 
-<!-- MATCHLER (AYNI) -->
 <div class="match">
 <div class="match-title">🎮 MATCH 1</div>
 <div class="label">🏆 Rank</div>
@@ -189,10 +188,11 @@ tr:nth-child(3){color:var(--bronze);font-weight:800;}
 
 <script>
 
-// 🔥 AUTO GEÇİŞ
+// 🔥 ENTER ile geçiş
 document.querySelectorAll("input").forEach((inp,i,arr)=>{
-inp.addEventListener("input",()=>{
-if(inp.value.length>=1){
+inp.addEventListener("keydown",(e)=>{
+if(e.key==="Enter"){
+e.preventDefault();
 let next=arr[i+1];
 if(next) next.focus();
 }
@@ -214,7 +214,7 @@ if(r==8)return 1;
 return 0;
 }
 
-// 🔥 LIVE PREVIEW
+// 🔥 LIVE PREVIEW (AYNI)
 function livePreview(){
 let totalKill=0,totalRank=0;
 
@@ -243,9 +243,8 @@ preview.innerText=`Live → Kill:${totalKill} Rank:${totalRank} Total:${total}`;
 
 document.querySelectorAll("input").forEach(i=>i.addEventListener("input",livePreview));
 
-// 🔥 ADD (AYNI)
+// 🔥 ADD / RENDER / WHATSAPP AYNI
 function add(){
-
 let name = team.value.trim();
 if(!name) return alert("Takım gir!");
 
@@ -274,15 +273,7 @@ if(r==1) wins++;
 
 let total=totalKill+totalRank+bonusVal-penaltyVal;
 
-data.push({
-name:name.toUpperCase(),
-k:totalKill,
-r:totalRank,
-t:total,
-w:wins,
-b:bonusVal,
-p:penaltyVal
-});
+data.push({name:name.toUpperCase(),k:totalKill,r:totalRank,t:total,w:wins,b:bonusVal,p:penaltyVal});
 
 localStorage.setItem("scrimData", JSON.stringify(data));
 render();
