@@ -20,14 +20,12 @@ body{
   padding:20px;
 }
 
-/* Başlık */
 h1{
   font-family:'Orbitron';
   color:var(--gold);
   text-shadow:0 0 12px rgba(255,204,0,.8);
 }
 
-/* Panel */
 .container{
   background:rgba(15,15,15,0.8);
   backdrop-filter:blur(12px);
@@ -38,7 +36,6 @@ h1{
   display:inline-block;
 }
 
-/* Input */
 input{
   padding:8px;
   margin:4px;
@@ -53,7 +50,6 @@ input:focus{
   box-shadow:0 0 10px var(--neon);
 }
 
-/* Match */
 .match{
   border:1px solid #222;
   margin:10px;
@@ -62,7 +58,6 @@ input:focus{
   background:#111;
 }
 
-/* Buton */
 button{
   padding:10px;
   margin:5px;
@@ -77,7 +72,6 @@ button{
 .wa{background:#25D366;width:100%;}
 .export{background:#00acee;width:100%;}
 
-/* Tablo */
 table{
   width:95%;
   margin:25px auto;
@@ -94,7 +88,6 @@ td{
   padding:10px;
 }
 
-/* 1. sıra */
 tr:first-child{
   background:#2a2000;
   color:var(--gold);
@@ -143,6 +136,13 @@ tr:first-child{
 <input id="m4p4" placeholder="P4">
 </div>
 
+<!-- 🔥 EKLENEN -->
+<div class="match">
+<b>PUAN DÜZENLE</b><br>
+<input id="bonus" placeholder="+PUAN">
+<input id="penalty" placeholder="-PUAN">
+</div>
+
 <button class="add" onclick="add()">EKLE</button>
 <button class="reset" onclick="resetAll()">SIFIRLA</button>
 <button class="wa" onclick="sendWhatsApp()">WHATSAPP</button>
@@ -153,7 +153,7 @@ tr:first-child{
 <table>
 <thead>
 <tr>
-<th>#</th><th>TEAM</th><th>WWNC</th><th>KILL</th><th>RANK</th><th>TOTAL</th>
+<th>#</th><th>TEAM</th><th>WWNC</th><th>KILL</th><th>RANK</th><th>EXTRA</th><th>TOTAL</th>
 </tr>
 </thead>
 <tbody id="board"></tbody>
@@ -165,7 +165,7 @@ tr:first-child{
 
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 
-// PUAN SİSTEMİ
+// PUAN
 function rp(r){
 if(r==1)return 10;
 if(r==2)return 6;
@@ -183,6 +183,9 @@ function add(){
 
 let name = team.value.trim();
 if(!name) return alert("Takım gir!");
+
+let bonus = Number(document.getElementById("bonus").value) || 0;
+let penalty = Number(document.getElementById("penalty").value) || 0;
 
 let totalKill=0;
 let totalRank=0;
@@ -208,14 +211,15 @@ totalRank+=rp(r);
 if(r==1) wins++;
 }
 
-let total=totalKill+totalRank;
+let total = totalKill + totalRank + bonus - penalty;
 
 data.push({
 name:name.toUpperCase(),
 k:totalKill,
 r:totalRank,
 t:total,
-w:wins
+w:wins,
+extra:(bonus - penalty)
 });
 
 localStorage.setItem("scrimData", JSON.stringify(data));
@@ -240,6 +244,7 @@ html+=`
 <td>${x.w>0?"x"+x.w:"-"}</td>
 <td>${x.k}</td>
 <td>${x.r}</td>
+<td>${x.extra}</td>
 <td>${x.t}</td>
 </tr>`;
 });
@@ -261,6 +266,7 @@ msg+=`${i+1}. ${x.name}\n`;
 msg+=w;
 msg+=`Kill: ${x.k}\n`;
 msg+=`Rank: ${x.r}\n`;
+msg+=`Extra: ${x.extra}\n`;
 msg+=`Total: ${x.t}\n\n`;
 });
 
@@ -274,9 +280,8 @@ localStorage.removeItem("scrimData");
 board.innerHTML="";
 }
 
-// PNG
+// PNG aynı
 function exportImage(){
-
 let c=canvas;
 let ctx=c.getContext("2d");
 
@@ -304,6 +309,5 @@ link.click();
 render();
 
 </script>
-
 </body>
 </html>
