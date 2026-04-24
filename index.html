@@ -25,15 +25,12 @@ body{
 h1{
   font-family:'Orbitron';
   color:var(--gold);
-  text-shadow:0 0 12px rgba(255,204,0,.8);
 }
 
 .container{
   background:rgba(15,15,15,0.8);
-  backdrop-filter:blur(12px);
   padding:25px;
   border-radius:18px;
-  border:1px solid rgba(0,255,208,.3);
   display:inline-block;
 }
 
@@ -41,7 +38,6 @@ input{
   padding:8px;
   margin:4px;
   border-radius:10px;
-  border:1px solid #222;
   background:#111;
   color:#fff;
   width:70px;
@@ -51,7 +47,6 @@ input{
   border:1px solid #222;
   margin:10px;
   padding:10px;
-  border-radius:12px;
 }
 
 button{
@@ -84,7 +79,7 @@ td{
   padding:10px;
 }
 
-/* MVP renkler */
+/* MVP */
 tr:nth-child(1){color:var(--gold);font-weight:900;}
 tr:nth-child(2){color:var(--silver);font-weight:800;}
 tr:nth-child(3){color:var(--bronze);font-weight:800;}
@@ -101,39 +96,22 @@ tr:nth-child(3){color:var(--bronze);font-weight:800;}
 <input id="team" placeholder="TEAM">
 
 <div class="match">Match 1<br>
-<input id="r1" placeholder="Rank">
-<input id="m1p1" placeholder="P1">
-<input id="m1p2" placeholder="P2">
-<input id="m1p3" placeholder="P3">
-<input id="m1p4" placeholder="P4">
+<input id="r1"><input id="m1p1"><input id="m1p2"><input id="m1p3"><input id="m1p4">
 </div>
 
 <div class="match">Match 2<br>
-<input id="r2" placeholder="Rank">
-<input id="m2p1" placeholder="P1">
-<input id="m2p2" placeholder="P2">
-<input id="m2p3" placeholder="P3">
-<input id="m2p4" placeholder="P4">
+<input id="r2"><input id="m2p1"><input id="m2p2"><input id="m2p3"><input id="m2p4">
 </div>
 
 <div class="match">Match 3<br>
-<input id="r3" placeholder="Rank">
-<input id="m3p1" placeholder="P1">
-<input id="m3p2" placeholder="P2">
-<input id="m3p3" placeholder="P3">
-<input id="m3p4" placeholder="P4">
+<input id="r3"><input id="m3p1"><input id="m3p2"><input id="m3p3"><input id="m3p4">
 </div>
 
 <div class="match">Match 4<br>
-<input id="r4" placeholder="Rank">
-<input id="m4p1" placeholder="P1">
-<input id="m4p2" placeholder="P2">
-<input id="m4p3" placeholder="P3">
-<input id="m4p4" placeholder="P4">
+<input id="r4"><input id="m4p1"><input id="m4p2"><input id="m4p3"><input id="m4p4">
 </div>
 
 <div class="match">
-<b>PUAN DÜZENLE</b><br>
 <input id="bonus" placeholder="+PUAN">
 <input id="penalty" placeholder="-PUAN">
 </div>
@@ -175,26 +153,25 @@ function add(){
 let name = team.value.trim();
 if(!name) return alert("Takım gir!");
 
-let bonus = Number(document.getElementById("bonus").value) || 0;
-let penalty = Number(document.getElementById("penalty").value) || 0;
+// 🔥 FIX
+let bonus = Math.abs(Number(bonus.value)) || 0;
+let penalty = Math.abs(Number(penalty.value)) || 0;
 
 let totalKill=0;
 let totalRank=0;
 let wins=0;
 
 for(let i=1;i<=4;i++){
-
 let rInput=document.getElementById("r"+i).value;
 if(rInput==="") continue;
 
 let r=Number(rInput);
 
-let p1=Number(document.getElementById("m"+i+"p1").value)||0;
-let p2=Number(document.getElementById("m"+i+"p2").value)||0;
-let p3=Number(document.getElementById("m"+i+"p3").value)||0;
-let p4=Number(document.getElementById("m"+i+"p4").value)||0;
-
-let kill=p1+p2+p3+p4;
+let kill =
+(Number(document.getElementById("m"+i+"p1").value)||0)+
+(Number(document.getElementById("m"+i+"p2").value)||0)+
+(Number(document.getElementById("m"+i+"p3").value)||0)+
+(Number(document.getElementById("m"+i+"p4").value)||0);
 
 totalKill+=kill;
 totalRank+=rp(r);
@@ -202,6 +179,7 @@ totalRank+=rp(r);
 if(r==1) wins++;
 }
 
+// 🔥 DOĞRU TOTAL
 let total = totalKill + totalRank + bonus - penalty;
 
 data.push({
@@ -209,13 +187,13 @@ name:name.toUpperCase(),
 k:totalKill,
 r:totalRank,
 t:total,
-w:wins
+w:wins,
+b:bonus,
+p:penalty
 });
 
 localStorage.setItem("scrimData", JSON.stringify(data));
-
 render();
-
 document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
@@ -226,6 +204,11 @@ let sorted=[...data].sort((a,b)=>b.t-a.t);
 let html="";
 
 sorted.forEach((x,i)=>{
+
+let extra="";
+if(x.b>0) extra+=" +"+x.b;
+if(x.p>0) extra+=" -"+x.p;
+
 html+=`
 <tr>
 <td>${i+1}</td>
@@ -233,7 +216,7 @@ html+=`
 <td>${x.w>0?"x"+x.w:"-"}</td>
 <td>${x.k}</td>
 <td>${x.r}</td>
-<td>${x.t}</td>
+<td>${x.t}${extra}</td>
 </tr>`;
 });
 
@@ -249,13 +232,16 @@ let msg="20msVIP DAILY RESULT\n\n";
 sorted.forEach((x,i)=>{
 
 let mvp = (i<3) ? " (MVP)" : "";
-let w=x.w>0?"WWNC: x"+x.w+"\n":"";
+
+let extra="";
+if(x.b>0) extra+=" +"+x.b;
+if(x.p>0) extra+=" -"+x.p;
 
 msg+=`${i+1}. ${x.name}${mvp}\n`;
-msg+=w;
 msg+=`Kill: ${x.k}\n`;
 msg+=`Rank: ${x.r}\n`;
-msg+=`Total: ${x.t}\n\n`;
+msg+=`Total: ${x.t}${extra}\n\n`;
+
 });
 
 window.open("https://wa.me/?text="+encodeURIComponent(msg));
@@ -268,7 +254,6 @@ board.innerHTML="";
 }
 
 function exportImage(){
-
 let c=canvas;
 let ctx=c.getContext("2d");
 
