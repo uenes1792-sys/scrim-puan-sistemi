@@ -41,14 +41,36 @@ input{
   background:#111;
   color:#fff;
   width:70px;
+  text-align:center;
 }
 
+/* 🔥 PROFESYONEL MATCH UI */
 .match{
   border:1px solid #222;
-  margin:10px;
-  padding:10px;
+  margin:12px;
+  padding:15px;
+  border-radius:14px;
+  background:linear-gradient(145deg,#0d0d0d,#161616);
 }
 
+.match-title{
+  font-weight:900;
+  color:#00ffd0;
+  margin-bottom:10px;
+}
+
+.label{
+  font-size:12px;
+  opacity:0.7;
+}
+
+.players{
+  display:flex;
+  justify-content:center;
+  gap:5px;
+}
+
+/* buton */
 button{
   padding:10px;
   margin:5px;
@@ -63,6 +85,7 @@ button{
 .wa{background:#25D366;width:100%;}
 .export{background:#00acee;width:100%;}
 
+/* tablo */
 table{
   width:95%;
   margin:25px auto;
@@ -95,25 +118,62 @@ tr:nth-child(3){color:var(--bronze);font-weight:800;}
 
 <input id="team" placeholder="TEAM">
 
-<div class="match">Match 1<br>
-<input id="r1"><input id="m1p1"><input id="m1p2"><input id="m1p3"><input id="m1p4">
-</div>
-
-<div class="match">Match 2<br>
-<input id="r2"><input id="m2p1"><input id="m2p2"><input id="m2p3"><input id="m2p4">
-</div>
-
-<div class="match">Match 3<br>
-<input id="r3"><input id="m3p1"><input id="m3p2"><input id="m3p3"><input id="m3p4">
-</div>
-
-<div class="match">Match 4<br>
-<input id="r4"><input id="m4p1"><input id="m4p2"><input id="m4p3"><input id="m4p4">
-</div>
-
+<!-- MATCH 1 -->
 <div class="match">
-<input id="bonus" placeholder="+PUAN">
-<input id="penalty" placeholder="-PUAN">
+<div class="match-title">🎮 MATCH 1</div>
+<div class="label">🏆 Rank</div>
+<input id="r1" placeholder="Sıra">
+
+<div class="label">🔫 Player Kills</div>
+<div class="players">
+<input id="m1p1" placeholder="P1">
+<input id="m1p2" placeholder="P2">
+<input id="m1p3" placeholder="P3">
+<input id="m1p4" placeholder="P4">
+</div>
+</div>
+
+<!-- MATCH 2 -->
+<div class="match">
+<div class="match-title">🎮 MATCH 2</div>
+<div class="label">🏆 Rank</div>
+<input id="r2">
+
+<div class="label">🔫 Player Kills</div>
+<div class="players">
+<input id="m2p1"><input id="m2p2"><input id="m2p3"><input id="m2p4">
+</div>
+</div>
+
+<!-- MATCH 3 -->
+<div class="match">
+<div class="match-title">🎮 MATCH 3</div>
+<div class="label">🏆 Rank</div>
+<input id="r3">
+
+<div class="label">🔫 Player Kills</div>
+<div class="players">
+<input id="m3p1"><input id="m3p2"><input id="m3p3"><input id="m3p4">
+</div>
+</div>
+
+<!-- MATCH 4 -->
+<div class="match">
+<div class="match-title">🎮 MATCH 4</div>
+<div class="label">🏆 Rank</div>
+<input id="r4">
+
+<div class="label">🔫 Player Kills</div>
+<div class="players">
+<input id="m4p1"><input id="m4p2"><input id="m4p3"><input id="m4p4">
+</div>
+</div>
+
+<!-- BONUS -->
+<div class="match">
+<div class="label">➕➖ EXTRA PUAN</div>
+<input id="bonus" placeholder="+">
+<input id="penalty" placeholder="-">
 </div>
 
 <button class="add" onclick="add()">EKLE</button>
@@ -153,9 +213,8 @@ function add(){
 let name = team.value.trim();
 if(!name) return alert("Takım gir!");
 
-// 🔥 FIX
-let bonus = Math.abs(Number(bonus.value)) || 0;
-let penalty = Math.abs(Number(penalty.value)) || 0;
+let bonus = Math.abs(Number(document.getElementById("bonus").value)) || 0;
+let penalty = Math.abs(Number(document.getElementById("penalty").value)) || 0;
 
 let totalKill=0;
 let totalRank=0;
@@ -179,7 +238,6 @@ totalRank+=rp(r);
 if(r==1) wins++;
 }
 
-// 🔥 DOĞRU TOTAL
 let total = totalKill + totalRank + bonus - penalty;
 
 data.push({
@@ -194,6 +252,7 @@ p:penalty
 
 localStorage.setItem("scrimData", JSON.stringify(data));
 render();
+
 document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
