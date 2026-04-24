@@ -71,7 +71,6 @@ tr:nth-child(3){color:var(--bronze);}
 
 .green{color:var(--green);}
 .red{color:var(--red);}
-
 </style>
 </head>
 
@@ -83,25 +82,28 @@ tr:nth-child(3){color:var(--bronze);}
 
 <input id="team" placeholder="TEAM">
 
-<!-- MATCHLER AYNI -->
-<div class="match"><div class="match-title">MATCH 1</div>
+<!-- MATCHLER -->
+<div class="match"><div class="match-title">MATCH 1 (ERANGEL)</div>
 <input id="r1" placeholder="Sıra">
 <div class="players">
 <input id="m1p1"><input id="m1p2"><input id="m1p3"><input id="m1p4">
 </div></div>
 
-<div class="match"><div class="match-title">MATCH 2</div>
-<input id="r2"><div class="players">
+<div class="match"><div class="match-title">MATCH 2 (MIRAMAR)</div>
+<input id="r2">
+<div class="players">
 <input id="m2p1"><input id="m2p2"><input id="m2p3"><input id="m2p4">
 </div></div>
 
-<div class="match"><div class="match-title">MATCH 3</div>
-<input id="r3"><div class="players">
+<div class="match"><div class="match-title">MATCH 3 (ERANGEL)</div>
+<input id="r3">
+<div class="players">
 <input id="m3p1"><input id="m3p2"><input id="m3p3"><input id="m3p4">
 </div></div>
 
-<div class="match"><div class="match-title">MATCH 4</div>
-<input id="r4"><div class="players">
+<div class="match"><div class="match-title">MATCH 4 (RONDO)</div>
+<input id="r4">
+<div class="players">
 <input id="m4p1"><input id="m4p2"><input id="m4p3"><input id="m4p4">
 </div></div>
 
@@ -134,24 +136,36 @@ tr:nth-child(3){color:var(--bronze);}
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 let editIndex = -1;
 
-// 🔥 SADECE SAYI
-document.querySelectorAll("input").forEach(inp=>{
-inp.addEventListener("input",()=>{
-if(inp.id!=="team"){
-inp.value = inp.value.replace(/[^0-9]/g,'');
-}
-});
+// 🔥 TEAM büyük harf
+team.addEventListener("input", ()=>{
+  team.value = team.value.toUpperCase();
 });
 
-// 🔥 ENTER GEÇİŞ
-document.querySelectorAll("input").forEach((inp,i,arr)=>{
-inp.addEventListener("keydown",(e)=>{
-if(e.key==="Enter"){
-e.preventDefault();
-let next=arr[i+1];
-if(next) next.focus();
-}
+// 🔥 SADECE SAYI (paste dahil)
+document.querySelectorAll("input").forEach(inp=>{
+  if(inp.id !== "team"){
+    
+    inp.addEventListener("keydown",(e)=>{
+      if(["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Enter"].includes(e.key)) return;
+      if(!/[0-9]/.test(e.key)) e.preventDefault();
+    });
+
+    inp.addEventListener("paste",(e)=>{
+      e.preventDefault();
+    });
+
+  }
 });
+
+// 🔥 ENTER geçiş
+document.querySelectorAll("input").forEach((inp,i,arr)=>{
+  inp.addEventListener("keydown",(e)=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      let next=arr[i+1];
+      if(next) next.focus();
+    }
+  });
 });
 
 // PUAN
@@ -167,7 +181,7 @@ if(r==8)return 1;
 return 0;
 }
 
-// EKLE / EDIT
+// EKLE
 function add(){
 
 if(data.length>=25 && editIndex==-1){
@@ -210,11 +224,15 @@ render();
 document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
-// RENDER
+// 🔥 RENDER FIX (SİLME + EDIT ÇALIŞIR)
 function render(){
-let sorted=[...data].sort((a,b)=>b.t-a.t);
+
+let sorted = data
+.map((x,i)=>({...x, idx:i}))
+.sort((a,b)=>b.t-a.t);
 
 let html="";
+
 sorted.forEach((x,i)=>{
 
 let extra="";
@@ -230,8 +248,8 @@ html+=`
 <td>${x.r}</td>
 <td>${x.t}${extra}</td>
 <td>
-<button onclick="editTeam(${i})">✏️</button>
-<button onclick="deleteTeam(${i})">❌</button>
+<button onclick="editTeam(${x.idx})">✏️</button>
+<button onclick="deleteTeam(${x.idx})">❌</button>
 </td>
 </tr>`;
 });
@@ -239,17 +257,20 @@ html+=`
 board.innerHTML=html;
 }
 
-// SİL
+// 🔥 SİL
 function deleteTeam(i){
+if(!confirm("Silinsin mi?")) return;
 data.splice(i,1);
 localStorage.setItem("scrimData",JSON.stringify(data));
 render();
 }
 
-// EDIT
+// 🔥 EDIT
 function editTeam(i){
 let x=data[i];
 team.value=x.name;
+bonus.value=x.b||"";
+penalty.value=x.p||"";
 editIndex=i;
 }
 
