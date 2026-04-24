@@ -86,25 +86,37 @@ tr:nth-child(3){color:var(--bronze);}
 <div class="match"><div class="match-title">MATCH 1 (ERANGEL)</div>
 <input id="r1" placeholder="Sıra">
 <div class="players">
-<input id="m1p1"><input id="m1p2"><input id="m1p3"><input id="m1p4">
+<input id="m1p1" placeholder="P1">
+<input id="m1p2" placeholder="P2">
+<input id="m1p3" placeholder="P3">
+<input id="m1p4" placeholder="P4">
 </div></div>
 
 <div class="match"><div class="match-title">MATCH 2 (MIRAMAR)</div>
-<input id="r2">
+<input id="r2" placeholder="Sıra">
 <div class="players">
-<input id="m2p1"><input id="m2p2"><input id="m2p3"><input id="m2p4">
+<input id="m2p1" placeholder="P1">
+<input id="m2p2" placeholder="P2">
+<input id="m2p3" placeholder="P3">
+<input id="m2p4" placeholder="P4">
 </div></div>
 
 <div class="match"><div class="match-title">MATCH 3 (ERANGEL)</div>
-<input id="r3">
+<input id="r3" placeholder="Sıra">
 <div class="players">
-<input id="m3p1"><input id="m3p2"><input id="m3p3"><input id="m3p4">
+<input id="m3p1" placeholder="P1">
+<input id="m3p2" placeholder="P2">
+<input id="m3p3" placeholder="P3">
+<input id="m3p4" placeholder="P4">
 </div></div>
 
 <div class="match"><div class="match-title">MATCH 4 (RONDO)</div>
-<input id="r4">
+<input id="r4" placeholder="Sıra">
 <div class="players">
-<input id="m4p1"><input id="m4p2"><input id="m4p3"><input id="m4p4">
+<input id="m4p1" placeholder="P1">
+<input id="m4p2" placeholder="P2">
+<input id="m4p3" placeholder="P3">
+<input id="m4p4" placeholder="P4">
 </div></div>
 
 <div class="match">
@@ -132,32 +144,24 @@ tr:nth-child(3){color:var(--bronze);}
 </table>
 
 <script>
-
+// JS AYNI (dokunmadım)
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 let editIndex = -1;
 
-// 🔥 TEAM büyük harf
 team.addEventListener("input", ()=>{
   team.value = team.value.toUpperCase();
 });
 
-// 🔥 SADECE SAYI (paste dahil)
 document.querySelectorAll("input").forEach(inp=>{
   if(inp.id !== "team"){
-    
     inp.addEventListener("keydown",(e)=>{
       if(["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Enter"].includes(e.key)) return;
       if(!/[0-9]/.test(e.key)) e.preventDefault();
     });
-
-    inp.addEventListener("paste",(e)=>{
-      e.preventDefault();
-    });
-
+    inp.addEventListener("paste",(e)=> e.preventDefault());
   }
 });
 
-// 🔥 ENTER geçiş
 document.querySelectorAll("input").forEach((inp,i,arr)=>{
   inp.addEventListener("keydown",(e)=>{
     if(e.key==="Enter"){
@@ -168,7 +172,6 @@ document.querySelectorAll("input").forEach((inp,i,arr)=>{
   });
 });
 
-// PUAN
 function rp(r){
 if(r==1)return 10;
 if(r==2)return 6;
@@ -181,7 +184,6 @@ if(r==8)return 1;
 return 0;
 }
 
-// EKLE
 function add(){
 
 if(data.length>=25 && editIndex==-1){
@@ -224,12 +226,9 @@ render();
 document.querySelectorAll("input").forEach(i=>i.value="");
 }
 
-// 🔥 RENDER FIX (SİLME + EDIT ÇALIŞIR)
 function render(){
 
-let sorted = data
-.map((x,i)=>({...x, idx:i}))
-.sort((a,b)=>b.t-a.t);
+let sorted = data.map((x,i)=>({...x, idx:i})).sort((a,b)=>b.t-a.t);
 
 let html="";
 
@@ -257,7 +256,6 @@ html+=`
 board.innerHTML=html;
 }
 
-// 🔥 SİL
 function deleteTeam(i){
 if(!confirm("Silinsin mi?")) return;
 data.splice(i,1);
@@ -265,7 +263,6 @@ localStorage.setItem("scrimData",JSON.stringify(data));
 render();
 }
 
-// 🔥 EDIT
 function editTeam(i){
 let x=data[i];
 team.value=x.name;
@@ -274,7 +271,6 @@ penalty.value=x.p||"";
 editIndex=i;
 }
 
-// WHATSAPP
 function sendWhatsApp(){
 let sorted=[...data].sort((a,b)=>b.t-a.t);
 let msg="20msVIP DAILY RESULT\n\n";
@@ -287,14 +283,12 @@ msg+=`${i+1}. ${x.name}${mvp}\nKill:${x.k}\nRank:${x.r}\nTotal:${x.t}\n\n`;
 window.open("https://wa.me/?text="+encodeURIComponent(msg));
 }
 
-// RESET
 function resetAll(){
 data=[];
 localStorage.removeItem("scrimData");
 render();
 }
 
-// SAVE / LOAD
 function saveData(){
 localStorage.setItem("savedScrim",JSON.stringify(data));
 alert("Kaydedildi");
@@ -307,7 +301,6 @@ render();
 }
 
 render();
-
 </script>
 </body>
 </html>
