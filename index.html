@@ -82,7 +82,6 @@ tr:nth-child(3){color:var(--bronze);}
 
 <input id="team" placeholder="TEAM">
 
-<!-- MATCHLER -->
 <div class="match"><div class="match-title">MATCH 1 (ERANGEL)</div>
 <input id="r1" placeholder="Sıra">
 <div class="players">
@@ -144,12 +143,23 @@ tr:nth-child(3){color:var(--bronze);}
 </table>
 
 <script>
-// JS AYNI (dokunmadım)
+
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 let editIndex = -1;
 
+// büyük harf
 team.addEventListener("input", ()=>{
   team.value = team.value.toUpperCase();
+});
+
+// 🔥 EKLENEN TEK ŞEY (ESPORTS)
+team.addEventListener("blur", () => {
+  let val = team.value.trim().toUpperCase();
+  if(val && !val.endsWith("ESPORTS")){
+    team.value = val + " ESPORTS";
+  }else{
+    team.value = val;
+  }
 });
 
 document.querySelectorAll("input").forEach(inp=>{
