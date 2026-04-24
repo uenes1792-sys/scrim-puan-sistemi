@@ -4,22 +4,102 @@
 <meta charset="UTF-8">
 <title>20msVIP SCRIM SYSTEM PRO</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
 <style>
-body{background:#050505;color:#fff;font-family:'Arial Black';text-align:center;padding:20px;}
-.container{background:#111;padding:25px;border-radius:15px;display:inline-block;border:2px solid #00ffcc;}
-input{padding:8px;margin:4px;border-radius:8px;border:none;background:#1a1a1a;color:#fff;width:70px;}
-button{padding:10px;margin:5px;border:none;border-radius:8px;font-weight:900;cursor:pointer;}
+:root{
+  --neon:#00ffd0;
+  --gold:#ffcc00;
+}
 
-.add{background:#00ffcc;color:#000;}
-.reset{background:#ff3e3e;color:#fff;}
-.wa{background:#25D366;color:#fff;width:100%;}
-.export{background:#00acee;color:#fff;width:100%;}
+body{
+  background: radial-gradient(circle at top,#0a0a0a,#000);
+  color:#fff;
+  font-family:'Rajdhani',sans-serif;
+  text-align:center;
+  padding:20px;
+}
 
-table{width:95%;margin:25px auto;border-collapse:collapse;}
-th,td{border:1px solid #222;padding:10px;}
-th{background:#00ffcc;color:#000;}
+/* Başlık */
+h1{
+  font-family:'Orbitron';
+  color:var(--gold);
+  text-shadow:0 0 12px rgba(255,204,0,.8);
+}
 
-.match{border:1px solid #333;margin:10px;padding:10px;}
+/* Panel */
+.container{
+  background:rgba(15,15,15,0.8);
+  backdrop-filter:blur(12px);
+  padding:25px;
+  border-radius:18px;
+  border:1px solid rgba(0,255,208,.3);
+  box-shadow:0 0 25px rgba(0,255,208,.15);
+  display:inline-block;
+}
+
+/* Input */
+input{
+  padding:8px;
+  margin:4px;
+  border-radius:10px;
+  border:1px solid #222;
+  background:#111;
+  color:#fff;
+  width:70px;
+}
+input:focus{
+  border:1px solid var(--neon);
+  box-shadow:0 0 10px var(--neon);
+}
+
+/* Match */
+.match{
+  border:1px solid #222;
+  margin:10px;
+  padding:10px;
+  border-radius:12px;
+  background:#111;
+}
+
+/* Buton */
+button{
+  padding:10px;
+  margin:5px;
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.add{background:var(--neon);color:#000;}
+.reset{background:red;color:#fff;}
+.wa{background:#25D366;width:100%;}
+.export{background:#00acee;width:100%;}
+
+/* Tablo */
+table{
+  width:95%;
+  margin:25px auto;
+  border-collapse:collapse;
+}
+
+th{
+  background:var(--neon);
+  color:#000;
+}
+
+td{
+  border-bottom:1px solid #222;
+  padding:10px;
+}
+
+/* 1. sıra */
+tr:first-child{
+  background:#2a2000;
+  color:var(--gold);
+  font-weight:900;
+}
 </style>
 </head>
 
@@ -85,7 +165,7 @@ th{background:#00ffcc;color:#000;}
 
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 
-// 🔥 YENİ PUAN SİSTEMİ
+// PUAN SİSTEMİ
 function rp(r){
 if(r==1)return 10;
 if(r==2)return 6;
@@ -175,7 +255,6 @@ let sorted=[...data].sort((a,b)=>b.t-a.t);
 let msg="20msVIP DAILY RESULT\n\n";
 
 sorted.forEach((x,i)=>{
-
 let w=x.w>0?"WWNC: x"+x.w+"\n":"";
 
 msg+=`${i+1}. ${x.name}\n`;
@@ -225,5 +304,6 @@ link.click();
 render();
 
 </script>
+
 </body>
 </html>
