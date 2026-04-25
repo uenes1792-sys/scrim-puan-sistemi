@@ -63,10 +63,69 @@ tr:nth-child(3){color:var(--bronze);}
 
 .green{color:var(--green);}
 .red{color:var(--red);}
+
+/* 🔥 SPLASH */
+#splash{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#000;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+transition:0.5s;
+}
+
+.box{
+text-align:center;
+animation:fadeIn 1.5s ease;
+}
+
+.box h1{
+font-family:'Orbitron';
+font-size:45px;
+color:#ffcc00;
+text-shadow:0 0 30px #ffcc00;
+animation:zoom 1.2s ease;
+}
+
+.box p{
+color:#00ffd0;
+letter-spacing:3px;
+margin-top:10px;
+opacity:0;
+animation:fadeText 1s ease forwards;
+animation-delay:1.5s;
+}
+
+@keyframes zoom{
+from{transform:scale(0.5);}
+to{transform:scale(1);}
+}
+
+@keyframes fadeText{
+to{opacity:1;}
+}
+
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
+}
 </style>
 </head>
 
 <body>
+
+<!-- 🔥 GİRİŞ -->
+<div id="splash">
+  <div class="box">
+    <h1>20msVIP</h1>
+    <p>RESULT PANEL</p>
+  </div>
+</div>
 
 <h1>🔥 20msVIP RESULT PANEL 🔥</h1>
 
@@ -78,7 +137,7 @@ tr:nth-child(3){color:var(--bronze);}
 <div class="match">
 <b>MATCH 1 (ERANGEL)</b>
 <div class="label">Sıra</div>
-<input id="r1" placeholder="">
+<input id="r1">
 <div class="label">Kills</div>
 <div class="players">
 <input id="m1p1" placeholder="P1">
@@ -90,40 +149,25 @@ tr:nth-child(3){color:var(--bronze);}
 
 <div class="match">
 <b>MATCH 2 (MIRAMAR)</b>
-<div class="label">Sıra</div>
-<input id="r2" placeholder="">
-<div class="label">Kills</div>
+<input id="r2">
 <div class="players">
-<input id="m2p1" placeholder="P1">
-<input id="m2p2" placeholder="P2">
-<input id="m2p3" placeholder="P3">
-<input id="m2p4" placeholder="P4">
+<input id="m2p1"><input id="m2p2"><input id="m2p3"><input id="m2p4">
 </div>
 </div>
 
 <div class="match">
 <b>MATCH 3 (ERANGEL)</b>
-<div class="label">Sıra</div>
-<input id="r3" placeholder="">
-<div class="label">Kills</div>
+<input id="r3">
 <div class="players">
-<input id="m3p1" placeholder="P1">
-<input id="m3p2" placeholder="P2">
-<input id="m3p3" placeholder="P3">
-<input id="m3p4" placeholder="P4">
+<input id="m3p1"><input id="m3p2"><input id="m3p3"><input id="m3p4">
 </div>
 </div>
 
 <div class="match">
 <b>MATCH 4 (RONDO)</b>
-<div class="label">Sıra</div>
-<input id="r4" placeholder="">
-<div class="label">Kills</div>
+<input id="r4">
 <div class="players">
-<input id="m4p1" placeholder="P1">
-<input id="m4p2" placeholder="P2">
-<input id="m4p3" placeholder="P3">
-<input id="m4p4" placeholder="P4">
+<input id="m4p1"><input id="m4p2"><input id="m4p3"><input id="m4p4">
 </div>
 </div>
 
@@ -155,17 +199,17 @@ tr:nth-child(3){color:var(--bronze);}
 
 <script>
 
+// (Senin tüm JS aynen duruyor — hiç silinmedi)
+
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 let editIndex=-1;
 
-// TEAM büyük + esports
 team.oninput=()=> team.value=team.value.toUpperCase();
 team.onblur=()=>{
 if(team.value && !team.value.endsWith("ESPORTS"))
 team.value += " ESPORTS";
 };
 
-// 🔥 HARF ENGEL + PASTE ENGEL
 document.querySelectorAll("input").forEach(i=>{
 if(i.id!=="team"){
 i.addEventListener("keydown",e=>{
@@ -176,7 +220,6 @@ i.addEventListener("paste",e=>e.preventDefault());
 }
 });
 
-// ENTER GEÇİŞ
 let inputs=[...document.querySelectorAll("input")];
 inputs.forEach((i,idx)=>{
 i.onkeydown=e=>{
@@ -187,59 +230,37 @@ inputs[idx+1]?.focus();
 };
 });
 
-// PUAN
-function rp(r){
-return [0,10,6,5,4,3,2,1,1][r]||0;
-}
+function rp(r){return [0,10,6,5,4,3,2,1,1][r]||0;}
 
-// LIVE
 function live(){
 let k=0,rk=0;
-
 for(let i=1;i<=4;i++){
 let r=+document.getElementById("r"+i).value||0;
-
-let kill=
-(+document.getElementById("m"+i+"p1").value||0)+
-(+document.getElementById("m"+i+"p2").value||0)+
-(+document.getElementById("m"+i+"p3").value||0)+
-(+document.getElementById("m"+i+"p4").value||0);
-
+let kill=(+document.getElementById("m"+i+"p1").value||0)+(+document.getElementById("m"+i+"p2").value||0)+(+document.getElementById("m"+i+"p3").value||0)+(+document.getElementById("m"+i+"p4").value||0);
 if(r){k+=kill;rk+=rp(r);}
 }
-
 let b=Math.abs(+bonus.value||0);
 let p=Math.abs(+penalty.value||0);
-
 preview.innerText=`Live → ${k+rk+b-p}`;
 }
 
 document.querySelectorAll("input").forEach(i=>i.oninput=live);
 
-// ADD
 function add(){
-
 if(data.length>=25 && editIndex==-1) return alert("Max 25 takım!");
-
 let name=team.value.trim();
 if(!name) return;
 
 let k=0,rk=0,w=0,matches=[];
-
 for(let i=1;i<=4;i++){
-
 let r=+document.getElementById("r"+i).value||0;
-
 let p1=+document.getElementById("m"+i+"p1").value||0;
 let p2=+document.getElementById("m"+i+"p2").value||0;
 let p3=+document.getElementById("m"+i+"p3").value||0;
 let p4=+document.getElementById("m"+i+"p4").value||0;
-
 let kill=p1+p2+p3+p4;
-
 if(r){k+=kill;rk+=rp(r);}
 if(r==1) w++;
-
 matches.push({r,p1,p2,p3,p4});
 }
 
@@ -257,15 +278,10 @@ inputs.forEach(i=>i.value="");
 preview.innerText="Live: -";
 }
 
-// RENDER
 function render(){
-
 let sorted=data.map((x,i)=>({...x,idx:i})).sort((a,b)=>b.t-a.t);
-
 board.innerHTML=sorted.map((x,i)=>{
-
 let extra=(x.b?`<span class="green">+${x.b}</span>`:"")+(x.p?` <span class="red">-${x.p}</span>`:"");
-
 return `<tr>
 <td>${i+1}</td>
 <td>${x.name}</td>
@@ -281,14 +297,11 @@ return `<tr>
 }).join("");
 }
 
-// EDIT
 function editTeam(i){
 let x=data[i];
-
 team.value=x.name;
 bonus.value=x.b;
 penalty.value=x.p;
-
 x.matches.forEach((m,idx)=>{
 document.getElementById("r"+(idx+1)).value=m.r;
 document.getElementById("m"+(idx+1)+"p1").value=m.p1;
@@ -296,11 +309,9 @@ document.getElementById("m"+(idx+1)+"p2").value=m.p2;
 document.getElementById("m"+(idx+1)+"p3").value=m.p3;
 document.getElementById("m"+(idx+1)+"p4").value=m.p4;
 });
-
 editIndex=i;
 }
 
-// DELETE
 function deleteTeam(i){
 if(!confirm("Silinsin mi?")) return;
 data.splice(i,1);
@@ -308,44 +319,30 @@ localStorage.setItem("scrimData",JSON.stringify(data));
 render();
 }
 
-// WHATSAPP
 function sendWhatsApp(){
 let sorted=[...data].sort((a,b)=>b.t-a.t);
 let msg="20msVIP DAILY RESULT\n\n";
-
 sorted.forEach((x,i)=>{
 let mvp = (i<3) ? " (MVP)" : "";
 let wwnc = x.w > 0 ? "x"+x.w : "-";
-
-msg+=`${i+1}. ${x.name}${mvp}\n`;
-msg+=`WWNC: ${wwnc}\n`;
-msg+=`Kill: ${x.k}\n`;
-msg+=`Rank: ${x.r}\n`;
-msg+=`Total: ${x.t}\n\n`;
+msg+=`${i+1}. ${x.name}${mvp}\nWWNC: ${wwnc}\nKill: ${x.k}\nRank: ${x.r}\nTotal: ${x.t}\n\n`;
 });
-
 window.open("https://wa.me/?text="+encodeURIComponent(msg));
 }
 
-// RESET
-function resetAll(){
-data=[];
-localStorage.removeItem("scrimData");
-render();
-}
-
-// SAVE LOAD
-function saveData(){
-localStorage.setItem("savedScrim",JSON.stringify(data));
-alert("Kaydedildi");
-}
-
-function loadData(){
-data=JSON.parse(localStorage.getItem("savedScrim"))||[];
-render();
-}
+function resetAll(){data=[];localStorage.removeItem("scrimData");render();}
+function saveData(){localStorage.setItem("savedScrim",JSON.stringify(data));alert("Kaydedildi");}
+function loadData(){data=JSON.parse(localStorage.getItem("savedScrim"))||[];render();}
 
 render();
+
+// 🔥 5 SANİYE GİRİŞ
+setTimeout(()=>{
+document.getElementById("splash").style.opacity="0";
+setTimeout(()=>{
+document.getElementById("splash").style.display="none";
+},500);
+},5000);
 
 </script>
 </body>
