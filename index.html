@@ -16,7 +16,6 @@
   --red:#ff3e3e;
 }
 
-/* 🔥 BEYAZ SORUN %100 FIX */
 html{background:#000;}
 
 body{
@@ -84,19 +83,30 @@ tr:nth-child(3){color:var(--bronze);}
 .green{color:var(--green);}
 .red{color:var(--red);}
 
-/* 🔥 SOSYAL ALAN */
-.social{
-margin:30px 0;
-opacity:0.8;
-font-size:14px;
+/* 🔥 LIVE BAR */
+.liveBar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-top:15px;
+gap:10px;
 }
 
-.social p{
-margin:5px;
-color:#ccc;
+.liveBar h3{
+margin:0;
+flex:1;
+text-align:center;
 }
 
-.social p:hover{
+.leftSocial,
+.rightSocial{
+font-size:12px;
+opacity:0.7;
+white-space:nowrap;
+}
+
+.leftSocial:hover,
+.rightSocial:hover{
 color:#00ffd0;
 text-shadow:0 0 10px #00ffd0;
 }
@@ -168,6 +178,7 @@ to{opacity:1;}
 
 <input id="team" placeholder="TEAM">
 
+<!-- MATCHLER -->
 <div class="match">
 <b>MATCH 1 (ERANGEL)</b>
 <div class="label">Sıra</div>
@@ -233,7 +244,12 @@ to{opacity:1;}
 <button onclick="saveData()">KAYDET</button>
 <button onclick="loadData()">YÜKLE</button>
 
-<h3 id="preview">Live: -</h3>
+<!-- 🔥 BURASI DEĞİŞTİ -->
+<div class="liveBar">
+  <span class="leftSocial">📸 Instagram: 20msVİP</span>
+  <h3 id="preview">Live: -</h3>
+  <span class="rightSocial">📱 TikTok: 20msVİP</span>
+</div>
 
 </div>
 
@@ -246,14 +262,8 @@ to{opacity:1;}
 <tbody id="board"></tbody>
 </table>
 
-<!-- 🔥 EKLENEN SOSYAL -->
-<div class="social">
-  <p>📱 TikTok: 20msVİP</p>
-  <p>📸 Instagram: 20msVİP</p>
-</div>
-
 <script>
-// JS AYNEN SENİN
+// JS AYNI (dokunulmadı)
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 let editIndex=-1;
 
