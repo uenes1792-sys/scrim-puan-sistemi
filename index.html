@@ -17,9 +17,7 @@
 }
 
 /* 🔥 BEYAZ SORUN %100 FIX */
-html{
-  background:#000;
-}
+html{background:#000;}
 
 body{
   margin:0;
@@ -30,7 +28,6 @@ body{
   text-align:center;
 }
 
-/* 🔥 ALTTA BEYAZ KALMASIN */
 body::after{
   content:"";
   position:fixed;
@@ -42,15 +39,9 @@ body::after{
   z-index:-2;
 }
 
-/* 🔥 TABLO ARKASI */
-table, tbody{
-  background:transparent;
-}
+table, tbody{background:transparent;}
 
-/* 🔥 SPLASH */
-#splash{
-background:#000;
-}
+#splash{background:#000;}
 
 h1{font-family:'Orbitron';color:var(--gold);}
 
@@ -92,6 +83,23 @@ tr:nth-child(3){color:var(--bronze);}
 
 .green{color:var(--green);}
 .red{color:var(--red);}
+
+/* 🔥 SOSYAL ALAN */
+.social{
+margin:30px 0;
+opacity:0.8;
+font-size:14px;
+}
+
+.social p{
+margin:5px;
+color:#ccc;
+}
+
+.social p:hover{
+color:#00ffd0;
+text-shadow:0 0 10px #00ffd0;
+}
 
 /* 🔥 SPLASH */
 #splash{
@@ -147,7 +155,6 @@ to{opacity:1;}
 
 <body>
 
-<!-- 🔥 GİRİŞ -->
 <div id="splash">
   <div class="box">
     <h1>20msVIP</h1>
@@ -161,7 +168,6 @@ to{opacity:1;}
 
 <input id="team" placeholder="TEAM">
 
-<!-- MATCHLER -->
 <div class="match">
 <b>MATCH 1 (ERANGEL)</b>
 <div class="label">Sıra</div>
@@ -240,8 +246,14 @@ to{opacity:1;}
 <tbody id="board"></tbody>
 </table>
 
+<!-- 🔥 EKLENEN SOSYAL -->
+<div class="social">
+  <p>📱 TikTok: 20msVİP</p>
+  <p>📸 Instagram: 20msVİP</p>
+</div>
+
 <script>
-// SENİN JS HİÇ DEĞİŞMEDİ
+// JS AYNEN SENİN
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 let editIndex=-1;
 
@@ -377,7 +389,6 @@ function loadData(){data=JSON.parse(localStorage.getItem("savedScrim"))||[];rend
 
 render();
 
-// 🔥 3 SANİYE GİRİŞ
 setTimeout(()=>{
 document.getElementById("splash").style.opacity="0";
 setTimeout(()=>{
