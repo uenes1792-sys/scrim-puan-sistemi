@@ -16,32 +16,11 @@
   --red:#ff3e3e;
 }
 
-/* 🔥 BEYAZ ALT FIX */
+/* 🔥 BEYAZ ALT SORUN FIX */
 html, body{
   min-height:100%;
-  margin:0;
   background: radial-gradient(circle,#0a0a0a,#000);
-}
-
-/* 🔥 HAREKETLİ NEON ARKA PLAN */
-body::before{
-content:"";
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:
-radial-gradient(circle at 20% 30%, #00ffd020, transparent 40%),
-radial-gradient(circle at 80% 70%, #ffcc0020, transparent 40%);
-animation:bgMove 10s linear infinite;
-z-index:-1;
-}
-
-@keyframes bgMove{
-0%{transform:translate(0,0);}
-50%{transform:translate(-40px,20px);}
-100%{transform:translate(0,0);}
+  margin:0;
 }
 
 body{
@@ -50,22 +29,13 @@ body{
   text-align:center;
 }
 
-/* 🔥 NEON GLOW */
-h1{
-font-family:'Orbitron';
-color:var(--gold);
-text-shadow:
-0 0 5px #ffcc00,
-0 0 10px #ffcc00,
-0 0 20px #ffcc00;
-}
+h1{font-family:'Orbitron';color:var(--gold);}
 
 .container{
   background:#111;
   padding:20px;
   border-radius:15px;
   display:inline-block;
-  box-shadow:0 0 20px #00ffd050;
 }
 
 input{
@@ -121,6 +91,7 @@ animation:fadeIn 1.5s ease;
 }
 
 .box h1{
+font-family:'Orbitron';
 font-size:45px;
 color:#ffcc00;
 text-shadow:0 0 30px #ffcc00;
@@ -249,7 +220,6 @@ to{opacity:1;}
 
 <script>
 
-// SENİN JS AYNI
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 let editIndex=-1;
 
