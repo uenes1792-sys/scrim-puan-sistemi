@@ -43,6 +43,8 @@ input{
   border:1px solid #222;
 }
 
+.label{font-size:12px;opacity:.7}
+
 .match{margin:10px;padding:10px;background:#0f0f0f;border-radius:10px;}
 .players{display:flex;justify-content:center;gap:5px;}
 
@@ -73,29 +75,54 @@ tr:nth-child(3){color:var(--bronze);}
 <input id="team" placeholder="TEAM">
 
 <!-- MATCHLER -->
-<div class="match">MATCH 1 (ERANGEL)
+<div class="match">
+<b>MATCH 1 (ERANGEL)</b>
+<div class="label">Sıra</div>
 <input id="r1" placeholder="R">
+<div class="label">Kills</div>
 <div class="players">
-<input id="m1p1"><input id="m1p2"><input id="m1p3"><input id="m1p4">
-</div></div>
+<input id="m1p1" placeholder="P1">
+<input id="m1p2" placeholder="P2">
+<input id="m1p3" placeholder="P3">
+<input id="m1p4" placeholder="P4">
+</div>
+</div>
 
-<div class="match">MATCH 2 (MIRAMAR)
-<input id="r2">
+<div class="match">
+<b>MATCH 2 (MIRAMAR)</b>
+<div class="label">Sıra</div>
+<input id="r2" placeholder="R">
 <div class="players">
-<input id="m2p1"><input id="m2p2"><input id="m2p3"><input id="m2p4">
-</div></div>
+<input id="m2p1" placeholder="P1">
+<input id="m2p2" placeholder="P2">
+<input id="m2p3" placeholder="P3">
+<input id="m2p4" placeholder="P4">
+</div>
+</div>
 
-<div class="match">MATCH 3 (ERANGEL)
-<input id="r3">
+<div class="match">
+<b>MATCH 3 (ERANGEL)</b>
+<div class="label">Sıra</div>
+<input id="r3" placeholder="R">
 <div class="players">
-<input id="m3p1"><input id="m3p2"><input id="m3p3"><input id="m3p4">
-</div></div>
+<input id="m3p1" placeholder="P1">
+<input id="m3p2" placeholder="P2">
+<input id="m3p3" placeholder="P3">
+<input id="m3p4" placeholder="P4">
+</div>
+</div>
 
-<div class="match">MATCH 4 (RONDO)
-<input id="r4">
+<div class="match">
+<b>MATCH 4 (RONDO)</b>
+<div class="label">Sıra</div>
+<input id="r4" placeholder="R">
 <div class="players">
-<input id="m4p1"><input id="m4p2"><input id="m4p3"><input id="m4p4">
-</div></div>
+<input id="m4p1" placeholder="P1">
+<input id="m4p2" placeholder="P2">
+<input id="m4p3" placeholder="P3">
+<input id="m4p4" placeholder="P4">
+</div>
+</div>
 
 <div class="match">
 <input id="bonus" placeholder="+">
@@ -135,17 +162,18 @@ if(team.value && !team.value.endsWith("ESPORTS"))
 team.value += " ESPORTS";
 };
 
-// sadece sayı
+// 🔥 HARF ENGEL + PASTE ENGEL
 document.querySelectorAll("input").forEach(i=>{
 if(i.id!=="team"){
-i.onkeydown=e=>{
-if(!/[0-9]/.test(e.key) && !["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Enter"].includes(e.key))
-e.preventDefault();
-};
+i.addEventListener("keydown",e=>{
+if(["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Enter"].includes(e.key)) return;
+if(!/[0-9]/.test(e.key)) e.preventDefault();
+});
+i.addEventListener("paste",e=>e.preventDefault());
 }
 });
 
-// enter geçiş
+// ENTER GEÇİŞ
 let inputs=[...document.querySelectorAll("input")];
 inputs.forEach((i,idx)=>{
 i.onkeydown=e=>{
@@ -156,12 +184,12 @@ inputs[idx+1]?.focus();
 };
 });
 
-// puan sistemi
+// PUAN
 function rp(r){
 return [0,10,6,5,4,3,2,1,1][r]||0;
 }
 
-// LIVE TOTAL
+// LIVE
 function live(){
 let k=0,rk=0;
 
@@ -247,7 +275,6 @@ return `<tr>
 <button onclick="deleteTeam(${x.idx})">❌</button>
 </td>
 </tr>`;
-
 }).join("");
 }
 
