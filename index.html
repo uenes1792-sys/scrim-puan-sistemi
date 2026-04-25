@@ -17,55 +17,45 @@
 }
 
 body{
-  background: radial-gradient(circle at top,#0a0a0a,#000);
+  background: radial-gradient(circle,#0a0a0a,#000);
   color:#fff;
-  font-family:'Rajdhani',sans-serif;
+  font-family:'Rajdhani';
   text-align:center;
-  padding:20px;
 }
 
 h1{font-family:'Orbitron';color:var(--gold);}
 
 .container{
-  background:rgba(15,15,15,0.8);
-  padding:25px;
-  border-radius:18px;
+  background:#111;
+  padding:20px;
+  border-radius:15px;
   display:inline-block;
 }
 
 input{
+  width:60px;
   padding:8px;
-  margin:4px;
-  border-radius:10px;
-  background:#111;
-  color:#fff;
-  width:70px;
+  margin:3px;
   text-align:center;
-}
-
-.match{
+  background:#000;
+  color:#fff;
+  border-radius:8px;
   border:1px solid #222;
-  margin:12px;
-  padding:15px;
-  border-radius:14px;
-  background:linear-gradient(145deg,#0d0d0d,#161616);
 }
 
-.match-title{font-weight:900;color:#00ffd0;}
+.match{margin:10px;padding:10px;background:#0f0f0f;border-radius:10px;}
 .players{display:flex;justify-content:center;gap:5px;}
 
-button{
-  padding:10px;margin:5px;border:none;border-radius:10px;font-weight:700;cursor:pointer;
-}
+button{padding:8px 12px;margin:5px;border:none;border-radius:8px;font-weight:700;cursor:pointer;}
 .add{background:var(--neon);color:#000;}
 .reset{background:red;color:#fff;}
 .wa{background:#25D366;width:100%;}
 
-table{width:95%;margin:25px auto;border-collapse:collapse;}
+table{width:95%;margin:20px auto;border-collapse:collapse;}
 th{background:var(--neon);color:#000;}
-td{border-bottom:1px solid #222;padding:10px;}
+td{padding:8px;border-bottom:1px solid #222;}
 
-tr:nth-child(1){color:var(--gold);font-weight:900;}
+tr:nth-child(1){color:var(--gold);}
 tr:nth-child(2){color:var(--silver);}
 tr:nth-child(3){color:var(--bronze);}
 
@@ -83,40 +73,28 @@ tr:nth-child(3){color:var(--bronze);}
 <input id="team" placeholder="TEAM">
 
 <!-- MATCHLER -->
-<div class="match"><div class="match-title">MATCH 1 (ERANGEL)</div>
-<input id="r1" placeholder="Sıra">
+<div class="match">MATCH 1 (ERANGEL)
+<input id="r1" placeholder="R">
 <div class="players">
-<input id="m1p1" placeholder="P1">
-<input id="m1p2" placeholder="P2">
-<input id="m1p3" placeholder="P3">
-<input id="m1p4" placeholder="P4">
+<input id="m1p1"><input id="m1p2"><input id="m1p3"><input id="m1p4">
 </div></div>
 
-<div class="match"><div class="match-title">MATCH 2 (MIRAMAR)</div>
-<input id="r2" placeholder="Sıra">
+<div class="match">MATCH 2 (MIRAMAR)
+<input id="r2">
 <div class="players">
-<input id="m2p1" placeholder="P1">
-<input id="m2p2" placeholder="P2">
-<input id="m2p3" placeholder="P3">
-<input id="m2p4" placeholder="P4">
+<input id="m2p1"><input id="m2p2"><input id="m2p3"><input id="m2p4">
 </div></div>
 
-<div class="match"><div class="match-title">MATCH 3 (ERANGEL)</div>
-<input id="r3" placeholder="Sıra">
+<div class="match">MATCH 3 (ERANGEL)
+<input id="r3">
 <div class="players">
-<input id="m3p1" placeholder="P1">
-<input id="m3p2" placeholder="P2">
-<input id="m3p3" placeholder="P3">
-<input id="m3p4" placeholder="P4">
+<input id="m3p1"><input id="m3p2"><input id="m3p3"><input id="m3p4">
 </div></div>
 
-<div class="match"><div class="match-title">MATCH 4 (RONDO)</div>
-<input id="r4" placeholder="Sıra">
+<div class="match">MATCH 4 (RONDO)
+<input id="r4">
 <div class="players">
-<input id="m4p1" placeholder="P1">
-<input id="m4p2" placeholder="P2">
-<input id="m4p3" placeholder="P3">
-<input id="m4p4" placeholder="P4">
+<input id="m4p1"><input id="m4p2"><input id="m4p3"><input id="m4p4">
 </div></div>
 
 <div class="match">
@@ -132,6 +110,8 @@ tr:nth-child(3){color:var(--bronze);}
 <button onclick="saveData()">KAYDET</button>
 <button onclick="loadData()">YÜKLE</button>
 
+<h3 id="preview">Live: -</h3>
+
 </div>
 
 <table>
@@ -146,190 +126,151 @@ tr:nth-child(3){color:var(--bronze);}
 <script>
 
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
-let editIndex = -1;
+let editIndex=-1;
 
-// büyük harf + esports
-team.addEventListener("input", ()=>{
-  team.value = team.value.toUpperCase();
-});
-
-team.addEventListener("blur", () => {
-  let val = team.value.trim().toUpperCase();
-  if(val && !val.endsWith("ESPORTS")){
-    team.value = val + " ESPORTS";
-  }else{
-    team.value = val;
-  }
-});
+// TEAM büyük + esports
+team.oninput=()=> team.value=team.value.toUpperCase();
+team.onblur=()=>{
+if(team.value && !team.value.endsWith("ESPORTS"))
+team.value += " ESPORTS";
+};
 
 // sadece sayı
-document.querySelectorAll("input").forEach(inp=>{
-  if(inp.id !== "team"){
-    inp.addEventListener("keydown",(e)=>{
-      if(["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Enter"].includes(e.key)) return;
-      if(!/[0-9]/.test(e.key)) e.preventDefault();
-    });
-    inp.addEventListener("paste",(e)=> e.preventDefault());
-  }
+document.querySelectorAll("input").forEach(i=>{
+if(i.id!=="team"){
+i.onkeydown=e=>{
+if(!/[0-9]/.test(e.key) && !["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Enter"].includes(e.key))
+e.preventDefault();
+};
+}
 });
 
 // enter geçiş
-document.querySelectorAll("input").forEach((inp,i,arr)=>{
-  inp.addEventListener("keydown",(e)=>{
-    if(e.key==="Enter"){
-      e.preventDefault();
-      let next=arr[i+1];
-      if(next) next.focus();
-    }
-  });
+let inputs=[...document.querySelectorAll("input")];
+inputs.forEach((i,idx)=>{
+i.onkeydown=e=>{
+if(e.key==="Enter"){
+e.preventDefault();
+inputs[idx+1]?.focus();
+}
+};
 });
 
-// puan
+// puan sistemi
 function rp(r){
-if(r==1)return 10;
-if(r==2)return 6;
-if(r==3)return 5;
-if(r==4)return 4;
-if(r==5)return 3;
-if(r==6)return 2;
-if(r==7)return 1;
-if(r==8)return 1;
-return 0;
+return [0,10,6,5,4,3,2,1,1][r]||0;
 }
 
-// EKLE
-function add(){
-
-if(data.length>=25 && editIndex==-1){
-alert("Max 25 takım!");
-return;
-}
-
-let name = team.value.trim().toUpperCase();
-
-let totalKill=0,totalRank=0,wins=0;
+// LIVE TOTAL
+function live(){
+let k=0,rk=0;
 
 for(let i=1;i<=4;i++){
-let r=Number(document.getElementById("r"+i).value);
-if(!r) continue;
+let r=+document.getElementById("r"+i).value||0;
 
 let kill=
-(Number(document.getElementById("m"+i+"p1").value)||0)+
-(Number(document.getElementById("m"+i+"p2").value)||0)+
-(Number(document.getElementById("m"+i+"p3").value)||0)+
-(Number(document.getElementById("m"+i+"p4").value)||0);
+(+document.getElementById("m"+i+"p1").value||0)+
+(+document.getElementById("m"+i+"p2").value||0)+
+(+document.getElementById("m"+i+"p3").value||0)+
+(+document.getElementById("m"+i+"p4").value||0);
 
-totalKill+=kill;
-totalRank+=rp(r);
-if(r==1) wins++;
+if(r){k+=kill;rk+=rp(r);}
 }
 
-let bonusVal=Math.abs(Number(bonus.value))||0;
-let penaltyVal=Math.abs(Number(penalty.value))||0;
+let b=Math.abs(+bonus.value||0);
+let p=Math.abs(+penalty.value||0);
 
-let total=totalKill+totalRank+bonusVal-penaltyVal;
+preview.innerText=`Live → ${k+rk+b-p}`;
+}
 
-let obj={
-name,
-k:totalKill,
-r:totalRank,
-t:total,
-w:wins,
-b:bonusVal,
-p:penaltyVal,
+document.querySelectorAll("input").forEach(i=>i.oninput=live);
 
-matches:[
-{r:r1.value,p1:m1p1.value,p2:m1p2.value,p3:m1p3.value,p4:m1p4.value},
-{r:r2.value,p1:m2p1.value,p2:m2p2.value,p3:m2p3.value,p4:m2p4.value},
-{r:r3.value,p1:m3p1.value,p2:m3p2.value,p3:m3p3.value,p4:m3p4.value},
-{r:r4.value,p1:m4p1.value,p2:m4p2.value,p3:m4p3.value,p4:m4p4.value}
-]
-};
+// ADD
+function add(){
+
+if(data.length>=25 && editIndex==-1) return alert("Max 25 takım!");
+
+let name=team.value.trim();
+if(!name) return;
+
+let k=0,rk=0,w=0,matches=[];
+
+for(let i=1;i<=4;i++){
+
+let r=+document.getElementById("r"+i).value||0;
+
+let p1=+document.getElementById("m"+i+"p1").value||0;
+let p2=+document.getElementById("m"+i+"p2").value||0;
+let p3=+document.getElementById("m"+i+"p3").value||0;
+let p4=+document.getElementById("m"+i+"p4").value||0;
+
+let kill=p1+p2+p3+p4;
+
+if(r){k+=kill;rk+=rp(r);}
+if(r==1) w++;
+
+matches.push({r,p1,p2,p3,p4});
+}
+
+let b=Math.abs(+bonus.value||0);
+let p=Math.abs(+penalty.value||0);
+
+let obj={name,k,r:rk,t:k+rk+b-p,w,b,p,matches};
 
 if(editIndex==-1) data.push(obj);
-else{
-data[editIndex]=obj;
-editIndex=-1;
-}
+else{data[editIndex]=obj;editIndex=-1;}
 
 localStorage.setItem("scrimData",JSON.stringify(data));
 render();
-
-document.querySelectorAll("input").forEach(i=>i.value="");
+inputs.forEach(i=>i.value="");
+preview.innerText="Live: -";
 }
 
 // RENDER
 function render(){
 
-let sorted = data.map((x,i)=>({...x, idx:i})).sort((a,b)=>b.t-a.t);
+let sorted=data.map((x,i)=>({...x,idx:i})).sort((a,b)=>b.t-a.t);
 
-let html="";
+board.innerHTML=sorted.map((x,i)=>{
 
-sorted.forEach((x,i)=>{
+let extra=(x.b?`<span class="green">+${x.b}</span>`:"")+(x.p?` <span class="red">-${x.p}</span>`:"");
 
-let extra="";
-if(x.b>0) extra+=` <span class="green">+${x.b}</span>`;
-if(x.p>0) extra+=` <span class="red">-${x.p}</span>`;
-
-html+=`
-<tr>
+return `<tr>
 <td>${i+1}</td>
 <td>${x.name}</td>
-<td>${x.w>0?"x"+x.w:"-"}</td>
+<td>${x.w? "x"+x.w:"-"}</td>
 <td>${x.k}</td>
 <td>${x.r}</td>
-<td>${x.t}${extra}</td>
+<td>${x.t} ${extra}</td>
 <td>
 <button onclick="editTeam(${x.idx})">✏️</button>
 <button onclick="deleteTeam(${x.idx})">❌</button>
 </td>
 </tr>`;
-});
 
-board.innerHTML=html;
+}).join("");
 }
 
-// EDIT FULL
+// EDIT
 function editTeam(i){
-
 let x=data[i];
 
 team.value=x.name;
-bonus.value=x.b||"";
-penalty.value=x.p||"";
+bonus.value=x.b;
+penalty.value=x.p;
 
-if(x.matches){
-
-r1.value=x.matches[0].r||"";
-m1p1.value=x.matches[0].p1||"";
-m1p2.value=x.matches[0].p2||"";
-m1p3.value=x.matches[0].p3||"";
-m1p4.value=x.matches[0].p4||"";
-
-r2.value=x.matches[1].r||"";
-m2p1.value=x.matches[1].p1||"";
-m2p2.value=x.matches[1].p2||"";
-m2p3.value=x.matches[1].p3||"";
-m2p4.value=x.matches[1].p4||"";
-
-r3.value=x.matches[2].r||"";
-m3p1.value=x.matches[2].p1||"";
-m3p2.value=x.matches[2].p2||"";
-m3p3.value=x.matches[2].p3||"";
-m3p4.value=x.matches[2].p4||"";
-
-r4.value=x.matches[3].r||"";
-m4p1.value=x.matches[3].p1||"";
-m4p2.value=x.matches[3].p2||"";
-m4p3.value=x.matches[3].p3||"";
-m4p4.value=x.matches[3].p4||"";
-
-}
+x.matches.forEach((m,idx)=>{
+document.getElementById("r"+(idx+1)).value=m.r;
+document.getElementById("m"+(idx+1)+"p1").value=m.p1;
+document.getElementById("m"+(idx+1)+"p2").value=m.p2;
+document.getElementById("m"+(idx+1)+"p3").value=m.p3;
+document.getElementById("m"+(idx+1)+"p4").value=m.p4;
+});
 
 editIndex=i;
 }
 
-// SİL
+// DELETE
 function deleteTeam(i){
 if(!confirm("Silinsin mi?")) return;
 data.splice(i,1);
@@ -343,8 +284,7 @@ let sorted=[...data].sort((a,b)=>b.t-a.t);
 let msg="20msVIP DAILY RESULT\n\n";
 
 sorted.forEach((x,i)=>{
-let mvp=(i<3)?" (MVP)":"";
-msg+=`${i+1}. ${x.name}${mvp}\nKill:${x.k}\nRank:${x.r}\nTotal:${x.t}\n\n`;
+msg+=`${i+1}. ${x.name}${i<3?" (MVP)":""}\nKill:${x.k}\nRank:${x.r}\nTotal:${x.t}\n\n`;
 });
 
 window.open("https://wa.me/?text="+encodeURIComponent(msg));
@@ -364,8 +304,7 @@ alert("Kaydedildi");
 }
 
 function loadData(){
-let d=JSON.parse(localStorage.getItem("savedScrim"))||[];
-data=d;
+data=JSON.parse(localStorage.getItem("savedScrim"))||[];
 render();
 }
 
