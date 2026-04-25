@@ -314,7 +314,14 @@ let sorted=[...data].sort((a,b)=>b.t-a.t);
 let msg="20msVIP DAILY RESULT\n\n";
 
 sorted.forEach((x,i)=>{
-msg+=`${i+1}. ${x.name}${i<3?" (MVP)":""}\nKill:${x.k}\nRank:${x.r}\nTotal:${x.t}\n\n`;
+let mvp = (i<3) ? " (MVP)" : "";
+let wwnc = x.w > 0 ? "x"+x.w : "-";
+
+msg+=`${i+1}. ${x.name}${mvp}\n`;
+msg+=`WWNC: ${wwnc}\n`;
+msg+=`Kill: ${x.k}\n`;
+msg+=`Rank: ${x.r}\n`;
+msg+=`Total: ${x.t}\n\n`;
 });
 
 window.open("https://wa.me/?text="+encodeURIComponent(msg));
