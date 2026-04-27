@@ -83,7 +83,6 @@ tr:nth-child(3){color:var(--bronze);}
 .green{color:var(--green);}
 .red{color:var(--red);}
 
-/* 🔥 LIVE BAR */
 .liveBar{
 display:flex;
 align-items:center;
@@ -92,7 +91,6 @@ margin-top:15px;
 gap:10px;
 }
 
-/* 🔥 LIVE TEXT */
 .liveBar h3{
 margin:0;
 flex:1;
@@ -102,7 +100,6 @@ color:#fff;
 text-shadow:0 0 10px #00ffd0;
 }
 
-/* 🔥 SOSYAL YAZILAR (BÜYÜTÜLDÜ) */
 .leftSocial,
 .rightSocial{
 font-size:16px;
@@ -121,7 +118,6 @@ text-shadow:0 0 15px #00ffd0, 0 0 30px #00ffd0;
 transform:scale(1.05);
 }
 
-/* 🔥 SPLASH */
 #splash{
 position:fixed;
 top:0;
@@ -188,77 +184,60 @@ to{opacity:1;}
 
 <input id="team" placeholder="TEAM">
 
-<!-- MATCHLER -->
 <div class="match">
 <b>MATCH 1 (ERANGEL)</b>
 <div class="label">Sıra</div>
 <input id="r1">
 <div class="label">Kills</div>
 <div class="players">
-<input id="m1p1" placeholder="P1">
-<input id="m1p2" placeholder="P2">
-<input id="m1p3" placeholder="P3">
-<input id="m1p4" placeholder="P4">
+<input id="m1p1">
+<input id="m1p2">
+<input id="m1p3">
+<input id="m1p4">
 </div>
 </div>
 
 <div class="match">
 <b>MATCH 2 (MIRAMAR)</b>
-<div class="label">Sıra</div>
 <input id="r2">
-<div class="label">Kills</div>
 <div class="players">
-<input id="m2p1" placeholder="P1">
-<input id="m2p2" placeholder="P2">
-<input id="m2p3" placeholder="P3">
-<input id="m2p4" placeholder="P4">
+<input id="m2p1">
+<input id="m2p2">
+<input id="m2p3">
+<input id="m2p4">
 </div>
 </div>
 
 <div class="match">
 <b>MATCH 3 (ERANGEL)</b>
-<div class="label">Sıra</div>
 <input id="r3">
-<div class="label">Kills</div>
 <div class="players">
-<input id="m3p1" placeholder="P1">
-<input id="m3p2" placeholder="P2">
-<input id="m3p3" placeholder="P3">
-<input id="m3p4" placeholder="P4">
+<input id="m3p1">
+<input id="m3p2">
+<input id="m3p3">
+<input id="m3p4">
 </div>
 </div>
 
 <div class="match">
 <b>MATCH 4 (RONDO)</b>
-<div class="label">Sıra</div>
 <input id="r4">
-<div class="label">Kills</div>
 <div class="players">
-<input id="m4p1" placeholder="P1">
-<input id="m4p2" placeholder="P2">
-<input id="m4p3" placeholder="P3">
-<input id="m4p4" placeholder="P4">
+<input id="m4p1">
+<input id="m4p2">
+<input id="m4p3">
+<input id="m4p4">
 </div>
 </div>
 
-<div class="match">
 <input id="bonus" placeholder="+">
 <input id="penalty" placeholder="-">
-</div>
 
 <button class="add" onclick="add()">EKLE</button>
 <button class="reset" onclick="resetAll()">SIFIRLA</button>
-<button class="wa" onclick="sendWhatsApp()">WHATSAPP</button>
 
-<br>
-<button onclick="saveData()">KAYDET</button>
-<button onclick="loadData()">YÜKLE</button>
-
-<!-- 🔥 LIVE BAR -->
 <div class="liveBar">
-  <span class="leftSocial">📸 Instagram: 20msVİP</span>
-  <h3 id="preview">Live: -</h3>
-  <span class="rightSocial">📱 TikTok: 20msVİP</span>
+<h3 id="preview">Live: -</h3>
 </div>
 
 </div>
@@ -266,155 +245,92 @@ to{opacity:1;}
 <table>
 <thead>
 <tr>
-<th>#</th><th>TEAM</th><th>WWNC</th><th>KILL</th><th>RANK</th><th>TOTAL</th><th>⚙️</th>
+<th>#</th><th>TEAM</th><th>WWNC</th><th>KILL</th><th>RANK</th><th>TOTAL</th>
 </tr>
 </thead>
 <tbody id="board"></tbody>
 </table>
 
 <script>
-// JS HİÇ DEĞİŞMEDİ
+
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
-let editIndex=-1;
-
-team.oninput=()=> team.value=team.value.toUpperCase();
-team.onblur=()=>{
-if(team.value && !team.value.endsWith("ESPORTS"))
-team.value += " ESPORTS";
-};
-
-document.querySelectorAll("input").forEach(i=>{
-if(i.id!=="team"){
-i.addEventListener("keydown",e=>{
-if(["Backspace","Delete","ArrowLeft","ArrowRight","Tab","Enter"].includes(e.key)) return;
-if(!/[0-9]/.test(e.key)) e.preventDefault();
-});
-i.addEventListener("paste",e=>e.preventDefault());
-}
-});
-
-let inputs=[...document.querySelectorAll("input")];
-inputs.forEach((i,idx)=>{
-i.onkeydown=e=>{
-if(e.key==="Enter"){
-e.preventDefault();
-inputs[idx+1]?.focus();
-}
-};
-});
 
 function rp(r){return [0,10,6,5,4,3,2,1,1][r]||0;}
 
-function live(){
-let k=0,rk=0;
-for(let i=1;i<=4;i++){
-let r=+document.getElementById("r"+i).value||0;
-let kill=(+document.getElementById("m"+i+"p1").value||0)+(+document.getElementById("m"+i+"p2").value||0)+(+document.getElementById("m"+i+"p3").value||0)+(+document.getElementById("m"+i+"p4").value||0);
-if(r){k+=kill;rk+=rp(r);}
-}
-let b=Math.abs(+bonus.value||0);
-let p=Math.abs(+penalty.value||0);
-preview.innerText=`Live → ${k+rk+b-p}`;
-}
-
-document.querySelectorAll("input").forEach(i=>i.oninput=live);
-
 function add(){
-if(data.length>=25 && editIndex==-1) return alert("Max 25 takım!");
+
 let name=team.value.trim();
 if(!name) return;
 
-let k=0,rk=0,w=0,matches=[];
+let k=0,rk=0,w=0;
+
 for(let i=1;i<=4;i++){
 let r=+document.getElementById("r"+i).value||0;
 let p1=+document.getElementById("m"+i+"p1").value||0;
 let p2=+document.getElementById("m"+i+"p2").value||0;
 let p3=+document.getElementById("m"+i+"p3").value||0;
 let p4=+document.getElementById("m"+i+"p4").value||0;
+
 let kill=p1+p2+p3+p4;
-if(r){k+=kill;rk+=rp(r);}
+
+if(r){
+k+=kill;
+rk+=rp(r);
+}
+
 if(r==1) w++;
-matches.push({r,p1,p2,p3,p4});
 }
 
 let b=Math.abs(+bonus.value||0);
 let p=Math.abs(+penalty.value||0);
 
-let obj={name,k,r:rk,t:k+rk+b-p,w,b,p,matches};
+let total = k + rk + b - p;
 
-if(editIndex==-1) data.push(obj);
-else{data[editIndex]=obj;editIndex=-1;}
+data.push({
+name,
+k,
+r:rk,
+w,
+b,
+p,
+t:total
+});
 
-localStorage.setItem("scrimData",JSON.stringify(data));
 render();
-inputs.forEach(i=>i.value="");
-preview.innerText="Live: -";
 }
 
 function render(){
-let sorted=data.map((x,i)=>({...x,idx:i})).sort((a,b)=>b.t-a.t);
-board.innerHTML=sorted.map((x,i)=>{
-let extra=(x.b?`<span class="green">+${x.b}</span>`:"")+(x.p?` <span class="red">-${x.p}</span>`:"");
-return `<tr>
+
+let sorted = [...data].sort((a,b)=>{
+if(b.t !== a.t) return b.t - a.t;
+return b.k - a.k; // eşit totalde kill bak
+});
+
+board.innerHTML = sorted.map((x,i)=>{
+
+let extra = 
+(x.b?`<span class="green">+${x.b}</span>`:"")+
+(x.p?` <span class="red">-${x.p}</span>`:"");
+
+return `
+<tr>
 <td>${i+1}</td>
 <td>${x.name}</td>
 <td>${x.w? "x"+x.w:"-"}</td>
 <td>${x.k}</td>
 <td>${x.r}</td>
 <td>${x.t} ${extra}</td>
-<td>
-<button onclick="editTeam(${x.idx})">✏️</button>
-<button onclick="deleteTeam(${x.idx})">❌</button>
-</td>
-</tr>`;
+</tr>
+`;
 }).join("");
 }
 
-function editTeam(i){
-let x=data[i];
-team.value=x.name;
-bonus.value=x.b;
-penalty.value=x.p;
-x.matches.forEach((m,idx)=>{
-document.getElementById("r"+(idx+1)).value=m.r;
-document.getElementById("m"+(idx+1)+"p1").value=m.p1;
-document.getElementById("m"+(idx+1)+"p2").value=m.p2;
-document.getElementById("m"+(idx+1)+"p3").value=m.p3;
-document.getElementById("m"+(idx+1)+"p4").value=m.p4;
-});
-editIndex=i;
-}
-
-function deleteTeam(i){
-if(!confirm("Silinsin mi?")) return;
-data.splice(i,1);
-localStorage.setItem("scrimData",JSON.stringify(data));
+function resetAll(){
+data=[];
 render();
 }
 
-function sendWhatsApp(){
-let sorted=[...data].sort((a,b)=>b.t-a.t);
-let msg="20msVIP DAILY RESULT\n\n";
-sorted.forEach((x,i)=>{
-let mvp = (i<3) ? " (MVP)" : "";
-let wwnc = x.w > 0 ? "x"+x.w : "-";
-msg+=`${i+1}. ${x.name}${mvp}\nWWNC: ${wwnc}\nKill: ${x.k}\nRank: ${x.r}\nTotal: ${x.t}\n\n`;
-});
-window.open("https://wa.me/?text="+encodeURIComponent(msg));
-}
-
-function resetAll(){data=[];localStorage.removeItem("scrimData");render();}
-function saveData(){localStorage.setItem("savedScrim",JSON.stringify(data));alert("Kaydedildi");}
-function loadData(){data=JSON.parse(localStorage.getItem("savedScrim"))||[];render();}
-
 render();
-
-setTimeout(()=>{
-document.getElementById("splash").style.opacity="0";
-setTimeout(()=>{
-document.getElementById("splash").style.display="none";
-},500);
-},3000);
 
 </script>
 </body>
