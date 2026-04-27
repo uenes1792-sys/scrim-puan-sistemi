@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -188,7 +188,6 @@ to{opacity:1;}
 
 <input id="team" placeholder="TEAM">
 
-<!-- MATCHLER -->
 <div class="match">
 <b>MATCH 1 (ERANGEL)</b>
 <div class="label">Sıra</div>
@@ -254,7 +253,6 @@ to{opacity:1;}
 <button onclick="saveData()">KAYDET</button>
 <button onclick="loadData()">YÜKLE</button>
 
-<!-- 🔥 LIVE BAR -->
 <div class="liveBar">
   <span class="leftSocial">📸 Instagram: 20msVİP</span>
   <h3 id="preview">Live: -</h3>
@@ -273,7 +271,7 @@ to{opacity:1;}
 </table>
 
 <script>
-// JS HİÇ DEĞİŞMEDİ
+// JS KISMINDA TOPLAM PUAN EŞİTSE KILL PUANINA GÖRE SIRALAMA EKLENDİ
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 let editIndex=-1;
 
@@ -352,7 +350,8 @@ preview.innerText="Live: -";
 }
 
 function render(){
-let sorted=data.map((x,i)=>({...x,idx:i})).sort((a,b)=>b.t-a.t);
+// b.t - a.t (Toplam puan) eşitse (||), b.k - a.k (Kill puanı) olarak sıralar
+let sorted=data.map((x,i)=>({...x,idx:i})).sort((a,b)=>b.t - a.t || b.k - a.k);
 board.innerHTML=sorted.map((x,i)=>{
 let extra=(x.b?`<span class="green">+${x.b}</span>`:"")+(x.p?` <span class="red">-${x.p}</span>`:"");
 return `<tr>
@@ -393,7 +392,8 @@ render();
 }
 
 function sendWhatsApp(){
-let sorted=[...data].sort((a,b)=>b.t-a.t);
+// WhatsApp için de aynı kill puanı avantajı sağlandı
+let sorted=[...data].sort((a,b)=>b.t - a.t || b.k - a.k);
 let msg="20msVIP DAILY RESULT\n\n";
 sorted.forEach((x,i)=>{
 let mvp = (i<3) ? " (MVP)" : "";
