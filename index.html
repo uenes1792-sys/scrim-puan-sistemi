@@ -349,11 +349,10 @@ preview.innerText="Live: -";
 }
 
 function render(){
-// Sıralama Mantığı Kesinleştirildi: 1. Total Puan | 2. WWNC (Win) | 3. Kill Puanı
 let sorted = data.map((x,i)=>({...x,idx:i})).sort((a,b) => {
-    if (b.t !== a.t) return b.t - a.t; // Total puanları farklıysa total puana göre diz
-    if (b.w !== a.w) return b.w - a.w; // Total puanları eşitse WWNC (Win) sayısına göre diz
-    return b.k - a.k;                  // WWNC de eşitse Kill puanına göre diz
+    if (b.t !== a.t) return b.t - a.t; 
+    if (b.w !== a.w) return b.w - a.w; 
+    return b.k - a.k;                  
 });
 
 board.innerHTML=sorted.map((x,i)=>{
@@ -396,7 +395,6 @@ render();
 }
 
 function sendWhatsApp(){
-// WhatsApp çıktısı için de aynı kesin sıralama mantığı kullanıldı
 let sorted = [...data].sort((a,b) => {
     if (b.t !== a.t) return b.t - a.t;
     if (b.w !== a.w) return b.w - a.w;
@@ -407,7 +405,13 @@ let msg="20msVIP DAILY RESULT\n\n";
 sorted.forEach((x,i)=>{
 let mvp = (i<3) ? " (MVP)" : "";
 let wwnc = x.w > 0 ? "x"+x.w : "-";
-msg+=`${i+1}. ${x.name}${mvp}\nWWNC: ${wwnc}\nKill: ${x.k}\nRank: ${x.r}\nTotal: ${x.t}\n\n`;
+
+// WhatsApp için ceza ve bonus yazısı ayarlandı
+let extraText = "";
+if(x.b > 0) extraText += ` (+${x.b} Bonus)`;
+if(x.p > 0) extraText += ` (-${x.p} Ceza)`;
+
+msg+=`${i+1}. ${x.name}${mvp}\nWWNC: ${wwnc}\nKill: ${x.k}\nRank: ${x.r}\nTotal: ${x.t}${extraText}\n\n`;
 });
 window.open("https://wa.me/?text="+encodeURIComponent(msg));
 }
