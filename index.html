@@ -271,7 +271,6 @@ to{opacity:1;}
 </table>
 
 <script>
-// JS KISMINDA TOPLAM PUAN EŞİTSE KILL PUANINA GÖRE SIRALAMA EKLENDİ
 let data = JSON.parse(localStorage.getItem("scrimData")) || [];
 let editIndex=-1;
 
@@ -350,8 +349,13 @@ preview.innerText="Live: -";
 }
 
 function render(){
-// b.t - a.t (Toplam puan) eşitse (||), b.k - a.k (Kill puanı) olarak sıralar
-let sorted=data.map((x,i)=>({...x,idx:i})).sort((a,b)=>b.t - a.t || b.k - a.k);
+// Sıralama Mantığı Kesinleştirildi: 1. Total Puan | 2. WWNC (Win) | 3. Kill Puanı
+let sorted = data.map((x,i)=>({...x,idx:i})).sort((a,b) => {
+    if (b.t !== a.t) return b.t - a.t; // Total puanları farklıysa total puana göre diz
+    if (b.w !== a.w) return b.w - a.w; // Total puanları eşitse WWNC (Win) sayısına göre diz
+    return b.k - a.k;                  // WWNC de eşitse Kill puanına göre diz
+});
+
 board.innerHTML=sorted.map((x,i)=>{
 let extra=(x.b?`<span class="green">+${x.b}</span>`:"")+(x.p?` <span class="red">-${x.p}</span>`:"");
 return `<tr>
@@ -392,8 +396,13 @@ render();
 }
 
 function sendWhatsApp(){
-// WhatsApp için de aynı kill puanı avantajı sağlandı
-let sorted=[...data].sort((a,b)=>b.t - a.t || b.k - a.k);
+// WhatsApp çıktısı için de aynı kesin sıralama mantığı kullanıldı
+let sorted = [...data].sort((a,b) => {
+    if (b.t !== a.t) return b.t - a.t;
+    if (b.w !== a.w) return b.w - a.w;
+    return b.k - a.k;
+});
+
 let msg="20msVIP DAILY RESULT\n\n";
 sorted.forEach((x,i)=>{
 let mvp = (i<3) ? " (MVP)" : "";
